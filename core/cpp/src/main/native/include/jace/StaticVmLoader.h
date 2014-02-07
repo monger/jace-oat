@@ -38,6 +38,9 @@ public:
     #ifndef JACE_WANT_DYNAMIC_LOAD
       return JNI_GetCreatedJavaVMs(vmBuf, bufLen, nVMs);
     #else
+      (void)vmBuf;
+      (void)bufLen;
+      (void)nVMs;
       return -1;
     #endif
   }
@@ -48,6 +51,9 @@ public:
     #ifndef JACE_WANT_DYNAMIC_LOAD
       return JNI_CreateJavaVM(pvm, env, args);
     #else
+      (void)pvm;
+      (void)env;
+      (void)args;
       return -1;
     #endif
   }

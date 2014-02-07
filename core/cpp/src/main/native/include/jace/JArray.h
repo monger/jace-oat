@@ -358,7 +358,7 @@ public:
 		}
 
 		// post
-		Iterator operator++(int dummy)
+		Iterator operator++(int)
 		{
 			#ifdef JACE_CHECK_ARRAYS
 				if (current >= parent->length())
@@ -395,7 +395,7 @@ public:
 		}
 
 		// post
-		Iterator operator--(int dummy)
+		Iterator operator--(int)
 		{
 			#ifdef JACE_CHECK_ARRAYS
 				if (current == 0)
@@ -500,10 +500,10 @@ private:
 	bool operator==(const JArray& array);
 
 	// Methods for future implementation of caching
-	void cache(int begin, int end)
+	void cache(int, int)
 	{}
 
-	void release(int begin, int end)
+	void release(int, int)
 	{}
 
 	friend class Iterator;
