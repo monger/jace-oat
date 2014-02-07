@@ -249,10 +249,13 @@ const string VfprintfHook::stringValue() const
   return "vfprintf";
 }
 
+// Casting from a function pointer to an object pointer isn't valid C++
+// but JNI makes us do this.
+#ifdef __GNUC__
+__extension__
+#endif
 void* VfprintfHook::extraInfo()
 {
-  // Casting from a function pointer to an object pointer isn't valid C++
-  // but JNI makes us do this.
   return (void*) hook;
 }
 
@@ -270,11 +273,14 @@ const string ExitHook::stringValue() const
   return "exit";
 }
 
+// Casting from a function pointer to an object pointer isn't valid C++
+// but JNI makes us do this.
+#ifdef __GNUC__
+__extension__
+#endif
 void* ExitHook::extraInfo()
 {
-  // Casting from a function pointer to an object pointer isn't valid C++
-  // but JNI makes us do this.
-  return (void*) hook;
+    return (void*) hook;
 }
 
 Option* ExitHook::clone() const
@@ -291,11 +297,14 @@ const string AbortHook::stringValue() const
   return "abort";
 }
 
+// Casting from a function pointer to an object pointer isn't valid C++
+// but JNI makes us do this.
+#ifdef __GNUC__
+__extension__
+#endif
 void* AbortHook::extraInfo()
 {
-  // Casting from a function pointer to an object pointer isn't valid C++
-  // but JNI makes us do this.
-  return (void*) hook;
+    return (void*) hook;
 }
 
 Option* AbortHook::clone() const

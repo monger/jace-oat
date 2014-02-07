@@ -13,6 +13,9 @@ using std::string;
 
 BEGIN_NAMESPACE(jace)
 
+#ifdef __GNUC__
+__extension__
+#endif
 UnixVmLoader::UnixVmLoader(std::string _path, jint jniVersion) throw (JNIException): 
   VmLoader(jniVersion), path(_path), lib(0)
 {
