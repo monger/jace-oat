@@ -55,7 +55,7 @@ using std::wstring;
 
 #ifdef WIN32
 #include <windows.h>
-#else
+#elif !defined(__ANDROID__)
 #include <sys/types.h>
 #include <sys/syscall.h>
 #endif
@@ -636,27 +636,38 @@ JNIEnv* attachImpl(JavaVM* jvm, const jobject threadGroup, const char* name, con
 		return env;
 	}
 
-	JavaVMAttachArgs args = {0};
+	JavaVMAttachArgs args;
 	args.version = jniVersion;
 	if (name != 0)
 	{
-		args.name = new char[strlen(name)+1];
-		strcpy(args.name, name);
+#ifdef JACE_VM_ARGS_CONST_NAME
+        args.name = name;
+#else        
+        args.name = new char[strlen(name)+1];        
+        strcpy(args.name, name);
+#endif
 	}
 	else
 	{
 		string temp("NativeThread-");
 		temp += toString(getCurrentThreadId());
-		args.name = new char[temp.length() + 1];
-		strcpy(args.name, temp.c_str());
+#ifdef JACE_VM_ARGS_CONST_NAME
+        args.name = temp.c_str();
+#else
+        args.name = new char[temp.length() + 1];
+        strcpy(args.name, temp.c_str());
+#endif
 	}
 	args.group = threadGroup;
 	jint result;
-	if (!daemon)
-		result = jvm->AttachCurrentThread(reinterpret_cast<void**>(&env), &args);
-	else
-		result = jvm->AttachCurrentThreadAsDaemon(reinterpret_cast<void**>(&env), &args);
-	delete[] args.name;
+	if (!daemon) {
+		result = jvm->AttachCurrentThread(JACE_ENV_CAST &env, &args);
+	} else {
+		result = jvm->AttachCurrentThreadAsDaemon(JACE_ENV_CAST &env, &args);
+    }
+#ifndef JACE_VM_ARGS_CONST_NAME
+    delete[] args.name;
+#endif
 
 	if (result != 0)
 	{
@@ -1053,6 +1064,8 @@ string getCurrentThreadId()
 {
 #ifdef _WIN32
 	return toString(GetCurrentThreadId());
+#elif defined(__ANDROID__)
+    return toString(gettid());
 #else
 	return toString(syscall(SYS_gettid));
 #endif
