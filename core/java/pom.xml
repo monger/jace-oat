@@ -1,27 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
 	<parent>
-		<groupId>com.googlecode.jace</groupId>
-		<artifactId>jace-core</artifactId>
+    	<groupId>com.toonetown.maven.jace</groupId>
+		<artifactId>core</artifactId>
 		<version>1.2.33-SNAPSHOT</version>
 	</parent>
-	<artifactId>jace-core-java</artifactId>
+
+	<groupId>com.toonetown.maven.jace.core</groupId>
+	<artifactId>java</artifactId>
 	<name>Jace Core Java</name>
-	<description>Jace core module, Java source-code</description>
+	<description>Jace core module, Java source-code (OAT-based)</description>
+	<url>http://code.google.com/p/jace/</url>
+	<version>1.2.33-SNAPSHOT</version>
+
+    <packaging>jar</packaging>
+    
+	<licenses>
+		<license>
+			<name>New BSD License</name>
+			<url>http://en.wikipedia.org/wiki/BSD_licenses#3-clause_license_.28.22New_BSD_License.22.29</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>cowwoc</id>
+			<name>Gili Tzabari</name>
+		</developer>
+	</developers>
+    
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.ant</groupId>
+			<artifactId>ant</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm-all</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.4</version>
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
 						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
+						<goals><goal>copy-dependencies</goal></goals>
 						<configuration>
 							<outputDirectory>${project.build.directory}/dependency</outputDirectory>
 						</configuration>
@@ -30,32 +73,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.ant</groupId>
-			<artifactId>ant</artifactId>
-			<version>1.9.2</version>
-		</dependency>
-		<dependency>
-			<groupId>asm</groupId>
-			<artifactId>asm-all</artifactId>
-			<version>3.3.1</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.0.13</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>14.0.1</version>
-		</dependency>
-	</dependencies>
 </project>

@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
 	<parent>
-		<groupId>com.googlecode.jace</groupId>
+    	<groupId>com.toonetown.maven</groupId>
 		<artifactId>jace</artifactId>
 		<version>1.2.33-SNAPSHOT</version>
 	</parent>
-	<artifactId>jace-core</artifactId>
-	<packaging>pom</packaging>
+
+	<groupId>com.toonetown.maven.jace</groupId>
+	<artifactId>core</artifactId>
 	<name>Jace Core</name>
-	<description>Jace core module</description>
+	<description>Jace core module (OAT-based)</description>
 	<url>http://code.google.com/p/jace/</url>
+	<version>1.2.33-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+
 	<licenses>
 		<license>
 			<name>New BSD License</name>
@@ -18,21 +24,14 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-	<scm>
-		<url>https://jace.googlecode.com/hg/</url>
-		<connection>scm:hg:https://jace.googlecode.com/hg/</connection>
-		<developerConnection>scm:hg:https://jace.googlecode.com/hg/</developerConnection>
-	  <tag>HEAD</tag>
-  </scm>
-	<developers>
-		<developer>
-			<id>cowwoc</id>
-			<name>Gili Tzabari</name>
-		</developer>
-	</developers>
+
 	<modules>
-		<module>java</module>
-		<module>cpp</module>
-		<module>runtime</module>
+        <module>java</module>
+        <module>cpp</module>
+        <module>runtime</module>
 	</modules>
+    
+    <properties>
+        <maven.site.skip>true</maven.site.skip>
+    </properties>
 </project>

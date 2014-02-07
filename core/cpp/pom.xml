@@ -2,196 +2,55 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.googlecode.jace</groupId>
-		<artifactId>jace-core</artifactId>
-		<version>1.2.33-SNAPSHOT</version>
-	</parent>
-	<artifactId>jace-core-cpp</artifactId>
+        <groupId>com.toonetown.maven</groupId>
+        <artifactId>native-oat</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <!-- Empty relative path so that the reactor doesn't complain -->
+        <relativePath></relativePath>
+	</parent>  
+          
+	<groupId>com.toonetown.maven.jace.core</groupId>
+	<artifactId>cpp</artifactId>
 	<name>Jace Core C++</name>
-	<description>Jace core module, C++ source-code</description>
-	<build>
-		<directory>${basedir}/target/${jace.classifier}</directory>
-		<sourceDirectory>src/main/cpp</sourceDirectory>
-		<plugins>
-			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.4</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>com.googlecode.boost-maven-project</groupId>
-									<artifactId>boost-api</artifactId>
-									<version>${boost.version}</version>
-									<outputDirectory>${project.build.directory}/dependency/boost</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>com.googlecode.boost-maven-project</groupId>
-									<artifactId>boost-system</artifactId>
-									<classifier>${jace.classifier}</classifier>
-									<version>${boost.version}</version>
-									<outputDirectory>${project.build.directory}/dependency/boost</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>com.googlecode.boost-maven-project</groupId>
-									<artifactId>boost-date-time</artifactId>
-									<classifier>${boost.classifier}</classifier>
-									<version>${boost.version}</version>
-									<outputDirectory>${project.build.directory}/dependency/boost</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>com.googlecode.boost-maven-project</groupId>
-									<artifactId>boost-thread</artifactId>
-									<classifier>${boost.classifier}</classifier>
-									<version>${boost.version}</version>
-									<outputDirectory>${project.build.directory}/dependency/boost</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>com.googlecode.boost-maven-project</groupId>
-									<artifactId>boost-system</artifactId>
-									<classifier>${boost.classifier}</classifier>
-									<version>${boost.version}</version>
-									<outputDirectory>${project.build.directory}/dependency/boost</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>com.googlecode.boost-maven-project</groupId>
-									<artifactId>boost-chrono</artifactId>
-									<classifier>${boost.classifier}</classifier>
-									<version>${boost.version}</version>
-									<outputDirectory>${project.build.directory}/dependency/boost</outputDirectory>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>com.googlecode.cmake-maven-project</groupId>
-				<artifactId>cmake-maven-plugin</artifactId>
-				<version>${cmake.version}</version>
-				<executions>
-					<execution>
-						<id>cmake-generate</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<sourcePath>${project.build.directory}/sources</sourcePath>
-							<targetPath>${project.build.directory}/cmake</targetPath>
-							<generator>${cmake.generator}</generator>
-							<environmentVariables>
-								<BOOST_HOME>${project.build.directory}/dependency/boost</BOOST_HOME>
-								<BUILD_ARCHITECTURE>${build.architecture}</BUILD_ARCHITECTURE>
-							</environmentVariables>
-						</configuration>
-					</execution>
-					<execution>
-						<id>cmake-compile</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-						<configuration>
-							<projectDirectory>${project.build.directory}/cmake</projectDirectory>
-							<config>${cmake.config}</config>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.5</version>
-				<executions>
-					<execution>
-						<id>copy-sources</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/sources</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${project.build.sourceDirectory}</directory>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-					<execution>
-						<id>copy-binaries</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.outputDirectory}</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${project.build.directory}/cmake/${build.type}</directory>
-									<targetPath>lib</targetPath>
-									<includes>
-										<include>*.lib</include>
-										<include>*.dll</include>
-										<include>*.pdb</include>
-									</includes>
-								</resource>
-								<resource>
-									<directory>${project.build.directory}/sources/include</directory>
-									<targetPath>include</targetPath>
-									<includes>
-										<include>**/*.h</include>
-										<include>**/*.tsp</include>
-										<include>**/*.tsd</include>
-									</includes>
-								</resource>
-								<resource>
-									<directory>${project.build.directory}/cmake</directory>
-									<targetPath>lib</targetPath>
-									<includes>
-										<include>*.so</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-				<configuration>
-					<encoding>${project.build.sourceEncoding}</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<!-- Workaround for Maven bug: http://stackoverflow.com/a/6521686/14731 -->
-						<id>chmod-post-build</id>
-						<phase>generate-sources</phase>
-						<configuration>
-							<target>
-								<chmod file="${project.build.directory}/sources/post-build.sh" perm="755" />
-							</target>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<classifier>${jace.classifier}</classifier>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+	<description>Jace core module, C++ source-code (OAT-based)</description>
+	<url>http://code.google.com/p/jace/</url>
+	<version>1.2.33-SNAPSHOT</version>
+
+    <packaging>lib</packaging>
+    
+	<licenses>
+		<license>
+			<name>New BSD License</name>
+			<url>http://en.wikipedia.org/wiki/BSD_licenses#3-clause_license_.28.22New_BSD_License.22.29</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>cowwoc</id>
+			<name>Gili Tzabari</name>
+		</developer>
+	</developers>
+
+    <properties>
+        <!-- This is a lib project, so we set native.oat.phase.lib -->
+        <native.oat.phase.lib>${native.oat.phase.default.process-classes}</native.oat.phase.lib>        
+        <native.oat.cpp.sources>**/</native.oat.cpp.sources>
+        
+        <!-- The version of boost to use -->
+        <version.boost>1.55.0-SNAPSHOT</version.boost>
+        
+        <maven.site.skip>true</maven.site.skip>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.toonetown.maven</groupId>
+            <artifactId>boost</artifactId>
+            <version>${version.boost}</version>
+            <type>inczip</type>
+        </dependency>
+    </dependencies>
+
 </project>
