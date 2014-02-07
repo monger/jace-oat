@@ -166,6 +166,9 @@ std::string toUTF8(const wstring& src)
 	return result;
 }
 
+
+#define _TO_WIDE(c)     static_cast<wchar_t>(c)
+#define _FROM_WIDE(w)   static_cast<char>(w)
 /**
  * Converts a modified UTF-8 std::string to a std::wstring.
  *
@@ -174,22 +177,23 @@ std::string toUTF8(const wstring& src)
  */
 wstring fromUTF8(const string& src)
 {
-	char ch;
+    wchar_t wch;
 	size_t count;
-	char t1, t2; // trail bytes
+    wchar_t t1, t2; // trail bytes
 	std::wstring result;
 
 	// Faster loop without ongoing checking for pSrcLimit and pDestLimit.
 	string::const_iterator i = src.begin();
 	while (i != src.end())
 	{
+        wch = _TO_WIDE(*i);
 		count = result.length();
-		if (*i <= 0x7f)
+		if (wch <= 0x7f)
 		{
 			// fast ASCII loop
-			while (i != src.end() && *i <= 0x7f)
+			while (i != src.end() && ((wch = _TO_WIDE(*i))) <= 0x7f)
 			{
-				result += (char) *i;
+				result += wch;
 				++i;
 				--count;
 			}
@@ -210,24 +214,24 @@ wstring fromUTF8(const string& src)
 		}
 		do
 		{
-			ch = *i;
-			if(ch <= 0x7f)
+			wch = _TO_WIDE(*i);
+			if(wch <= 0x7f)
 			{
-				result += (char) ch;
+				result += wch;
 				++i;
 			}
 			else
 			{
-				if (ch >= 0xe0)
+				if (wch >= 0xe0)
 				{
 					// handle U+0000..U+FFFF inline
-					t1 = (char) (*(i + 1) - 0x80);
-					t2 = (char) (*(i + 2) - 0x80);
-					if (ch <= 0xef && t1 <= 0x3f && t2 <= 0x3f)
+					t1 = (_TO_WIDE(*(i + 1)) - 0x80);
+					t2 = (_TO_WIDE(*(i + 2)) - 0x80);
+					if (wch <= 0xef && t1 <= 0x3f && t2 <= 0x3f)
 					{
 						// no need for (ch & 0xf) because the upper bits are truncated after <<12 in the cast
 						// to (char)
-						result += (char) ((ch << 12) | (t1 << 6) | t2);
+						result += ((wch << 12) | (t1 << 6) | t2);
 						i += 3;
 						continue;
 					}
@@ -235,15 +239,15 @@ wstring fromUTF8(const string& src)
 				else
 				{
 					// handle U+0000..U+07FF inline
-					t1 = (char) (*(i + 1) - 0x80);
-					if (ch >= 0xc0 && t1 <= 0x3f)
+					t1 = (_TO_WIDE(*(i + 1)) - 0x80);
+					if (wch >= 0xc0 && t1 <= 0x3f)
 					{
-						result += (char) (((ch & 0x1f) << 6) | t1);
+						result += (((wch & 0x1f) << 6) | t1);
 						i += 2;
 						continue;
 					}
 				}
-				throw string("Invalid char found: ") + ch;
+				throw string("Invalid char found: ") + _FROM_WIDE(wch);
 			}
 		}
 		while (--count > 0);
@@ -251,25 +255,25 @@ wstring fromUTF8(const string& src)
 
 	while (i != src.end())
 	{
-		ch = *i;
-		if (ch <= 0x7f)
+		wch = _TO_WIDE(*i);
+		if (wch <= 0x7f)
 		{
-			result += (char) ch;
+			result += wch;
 			++i;
 		}
 		else
 		{
-			if (ch >= 0xe0)
+			if (wch >= 0xe0)
 			{
 				// handle U+0000..U+FFFF inline
-				t1 = (char) (*(i + 1) - 0x80);
-				t2 = (char) (*(i + 2) - 0x80);
-				if (ch <= 0xef && ((src.end() - i) >= 3) &&
+				t1 = (_TO_WIDE(*(i + 1)) - 0x80);
+				t2 = (_TO_WIDE(*(i + 2)) - 0x80);
+				if (wch <= 0xef && ((src.end() - i) >= 3) &&
 					t1 <= 0x3f && t2 <= 0x3f)
 				{
-					// no need for (ch & 0xf) because the upper bits are truncated after <<12 in the cast to
+					// no need for (wch & 0xf) because the upper bits are truncated after <<12 in the cast to
 					// char
-					result += (char) ((ch << 12) | (t1 << 6) | t2);
+					result += ((wch << 12) | (t1 << 6) | t2);
 					i += 3;
 					continue;
 				}
@@ -277,33 +281,33 @@ wstring fromUTF8(const string& src)
 			else
 			{
 				// handle U+0000..U+07FF inline
-				t1 = (char) (*(i + 1) - 0x80);
-				if (ch >= 0xc0 && ((src.end() - i) >= 2) &&
+				t1 = (_TO_WIDE(*(i + 1)) - 0x80);
+				if (wch >= 0xc0 && ((src.end() - i) >= 2) &&
 					t1 <= 0x3f)
 				{
-					result += (char) (((ch & 0x1f) << 6) | t1);
+					result += (((wch & 0x1f) << 6) | t1);
 					i += 2;
 					continue;
 				}
 			}
-			throw string("Invalid char found: ") + ch;
+			throw string("Invalid char found: ") + _FROM_WIDE(wch);
 		}
 	}
 
 	// do not fill the dest buffer just count the char needed
 	while (i != src.end())
 	{
-		ch = *i;
-		if (ch <= 0x7f)
+		wch = _TO_WIDE(*i);
+		if (wch <= 0x7f)
 			++i;
 		else
 		{
-			if (ch >= 0xe0)
+			if (wch >= 0xe0)
 			{
 				// handle U+0000..U+FFFF inline
-				if (ch <= 0xef && ((src.end() - i) >= 3) &&
-					(char) (*(i + 1) - 0x80) <= 0x3f &&
-					(char) (*(i + 2) - 0x80) <= 0x3f)
+				if (wch <= 0xef && ((src.end() - i) >= 3) &&
+					(_TO_WIDE(*(i + 1)) - 0x80) <= 0x3f &&
+					(_TO_WIDE(*(i + 2)) - 0x80) <= 0x3f)
 				{
 					i += 3;
 					continue;
@@ -312,14 +316,14 @@ wstring fromUTF8(const string& src)
 			else
 			{
 				// handle U+0000..U+07FF inline
-				if (ch >= 0xc0 && ((src.end() - i) >= 2) &&
-					(char) (*(i + 1) - 0x80) <= 0x3f)
+				if (wch >= 0xc0 && ((src.end() - i) >= 2) &&
+					(_TO_WIDE(*(i + 1)) - 0x80) <= 0x3f)
 				{
 					i += 2;
 					continue;
 				}
 			}
-			throw string("Invalid char found: ") + ch;
+			throw string("Invalid char found: ") + _FROM_WIDE(wch);
 		}
 	}
 	return result;
