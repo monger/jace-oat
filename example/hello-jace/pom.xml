@@ -84,6 +84,11 @@
                 <groupId>com.toonetown.maven.jace</groupId>
                 <artifactId>jace-maven-plugin</artifactId>
                 <version>${version.jace}</version>
+                <configuration>
+                    <classpath>
+                        <path>${java.home}/lib/rt.jar</path>
+                    </classpath>
+                </configuration>
                 <executions>
                     <execution>
                         <id>generate-proxies</id>
@@ -95,9 +100,6 @@
                             </inputSources>
                             <outputHeaders>${jace.generated-sources}/include</outputHeaders>
                             <outputSources>${jace.generated-sources}/c++</outputSources>
-                            <classpath>
-                                <path>${env.JAVA_HOME}/jre/lib/rt.jar</path>
-                            </classpath>
                         </configuration>
                     </execution>
                 </executions>
@@ -138,4 +140,23 @@
 
     </build>
     
+    <profiles>
+        <profile>
+            <id>android</id>
+            <activation><property><name>native.os</name><value>android</value></property></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.toonetown.maven.jace</groupId>
+                        <artifactId>jace-maven-plugin</artifactId>
+                        <configuration>
+                            <classpath>
+                                <path>${android.home}/platforms/${native.android.platform}/android.jar</path>
+                            </classpath>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
