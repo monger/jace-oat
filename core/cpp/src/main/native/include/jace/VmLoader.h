@@ -7,6 +7,8 @@
 
 #include <jni.h>
 
+#define DEFAULT_JNI_VERSION JNI_VERSION_1_6
+
 BEGIN_NAMESPACE(jace)
 
 /**
@@ -18,10 +20,6 @@ BEGIN_NAMESPACE(jace)
  * The default VmLoader is DefaultVmLoader. This loader statically links
  * to the VM, and thus works on every platform, although it limits your choice
  * to the virtual machine you compiled and linked against.
- *
- * In order to dynamically load a virtual machine, you must #define
- * JACE_WANT_DYNAMIC_LOAD. This keeps DefaultVmLoader from trying to statically
- * link with a VM. Then, you must instantiate your platform specific VmLoader.
  *
  * For Windows, you can use Win32VmLoader. It is capable of querying the registry
  * to discover different flavors of installed virtual machines.
@@ -40,9 +38,9 @@ public:
 	/**
 	 * Creates a new VmLoader.
 	 *
-	 * @param jniVersion the JNI version the JVM must support
+	 * @param jniVersion the JNI version the JVM must support.
 	 */
-	JACE_API VmLoader(jint jniVersion);
+	JACE_API VmLoader(jint jniVersion = DEFAULT_JNI_VERSION);
 
   /**
    * Returns the the JNI version the JVM must support.

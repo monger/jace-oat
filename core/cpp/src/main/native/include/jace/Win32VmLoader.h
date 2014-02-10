@@ -71,14 +71,14 @@ public:
 	 *        The default value is the version of the lastest Sun VM installed.
 	 *
 	 * @param jniVersion - The version of JNI to use. For example,
-	 * JNI_VERSION_1_2 or JNI_VERSION_1_4. The default is JNI_VERSION_1_2.
+	 * JNI_VERSION_1_2 or JNI_VERSION_1_4. The default is DEFAULT_JNI_VERSION.
 	 *
 	 * @throws JNIException if an error occurs while loading the JVM library.
 	 */
 	JACE_API Win32VmLoader(JVMVendor jvmVendor = JVMV_SUN,
 		JVMType jvmType = JVMT_DEFAULT,
 		std::string version = "",
-		jint jniVersion = JNI_VERSION_1_2) throw (JNIException);
+		jint jniVersion = DEFAULT_JNI_VERSION) throw (JNIException);
 
 	/**
 	 * Creates a new VM loader for the specified VM.
@@ -89,11 +89,11 @@ public:
 	 *               library search path (see LoadLibrary() for more information).
 	 *
 	 * @param version - The version of JNI to use. For example,
-	 * JNI_VERSION_1_2 or JNI_VERSION_1_4.
+	 * JNI_VERSION_1_2 or JNI_VERSION_1_4. The default is DEFAULT_JNI_VERSION
 	 *
 	 * @throws JNIException if an error occurs while loading the JVM library.
 	 */
-	JACE_API Win32VmLoader(std::string path, jint jniVersion) throw (JNIException);
+	JACE_API Win32VmLoader(std::string path, jint jniVersion = DEFAULT_JNI_VERSION) throw (JNIException);
 
 	JACE_API virtual ~Win32VmLoader();
 

@@ -176,10 +176,6 @@
 
 /* Android always does dynamic loading */
 #if defined __ANDROID__
-    #ifndef JACE_WANT_DYNAMIC_LOAD
-        #define JACE_WANT_DYNAMIC_LOAD
-    #endif
-
     #define JACE_JNI_ENV_PTR
     #define JACE_VM_ARGS_CONST_NAME
     #define JACE_ENV_CAST
