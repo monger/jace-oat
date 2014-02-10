@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Project Information -->
+    <name>Hello Jace</name>
+    <groupId>com.toonetown.maven.jace.example</groupId>
+    <artifactId>hello-jace</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    
+    <!-- Packaging is uexe - from the maven-native-plugin -->
+    <packaging>uexe</packaging>
+
+	<!-- Parent POM - the native-oat files -->
+	<parent>
+        <groupId>com.toonetown.maven</groupId>
+        <artifactId>native-oat</artifactId>
+		<version>1.0-SNAPSHOT</version>
+        <!-- Empty relative path so that the reactor doesn't complain -->
+        <relativePath></relativePath>
+	</parent>
+
+    <properties>
+        <!-- This is a executable project, so we set native.oat.phase.link -->
+        <native.oat.phase.link>${native.oat.phase.default.process-classes}</native.oat.phase.link>
+        
+        <!-- The location for our generated sources -->
+        <jace.generated-sources>target/generated-source/jace</jace.generated-sources>
+
+        <!-- The version of boost and jace to use -->
+        <version.boost>1.55.0-SNAPSHOT</version.boost>
+        <version.jace>1.2.33-SNAPSHOT</version.jace>
+    </properties>
+    
+	<!-- Dependencies -->
+    <dependencies>
+        <!-- Jace -->
+        <dependency>
+            <groupId>com.toonetown.maven.jace.core</groupId>
+            <artifactId>cpp</artifactId>
+            <version>${version.jace}</version>
+            <type>inczip</type>
+        </dependency>
+
+        <dependency>
+            <groupId>com.toonetown.maven.jace.core</groupId>
+            <artifactId>cpp</artifactId>
+            <version>${version.jace}</version>
+            <type>lib</type>
+            <classifier>${native.oat.classifier}</classifier>
+        </dependency>
+        
+        <!-- Boost (and Boost::System and Boost::Thread) -->
+        <dependency>
+            <groupId>com.toonetown.maven</groupId>
+            <artifactId>boost</artifactId>
+            <version>${version.boost}</version>
+            <type>inczip</type>
+        </dependency>
+
+        <dependency>
+            <groupId>com.toonetown.maven.boost</groupId>
+            <artifactId>system</artifactId>
+            <version>${version.boost}</version>
+            <type>lib</type>
+            <classifier>${native.oat.classifier}</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>com.toonetown.maven.boost</groupId>
+            <artifactId>thread</artifactId>
+            <version>${version.boost}</version>
+            <type>lib</type>
+            <classifier>${native.oat.classifier}</classifier>
+        </dependency>
+        
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.toonetown.maven.jace</groupId>
+                <artifactId>jace-maven-plugin</artifactId>
+                <version>${version.jace}</version>
+                <executions>
+                    <execution>
+                        <id>generate-proxies</id>
+                        <goals><goal>generate-cpp-proxies</goal></goals>
+                        <configuration>
+                            <inputSources>
+                                <!-- Only our c++ code - not our includes -->
+                                <path>${project.build.sourceDirectory}/c++</path>
+                            </inputSources>
+                            <outputHeaders>${jace.generated-sources}/include</outputHeaders>
+                            <outputSources>${jace.generated-sources}/c++</outputSources>
+                            <classpath>
+                                <path>${env.JAVA_HOME}/jre/lib/rt.jar</path>
+                            </classpath>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>                
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+                <configuration>
+                    <sources>
+                        <source>
+                            <directory>${native.oat.sourceInclude}</directory>
+                            <deployable>${native.oat.sourceIncludeDeployable}</deployable>
+                        </source>                        
+                        <source>
+                            <directory>${jace.generated-sources}/include</directory>
+                            <dependencyAnalysisParticipation>false</dependencyAnalysisParticipation>
+                        </source>
+                        <source>
+                            <directory>${project.build.sourceDirectory}/c++</directory>
+                            <includes>
+                                <include>${native.oat.cpp.sources}*.cpp</include>
+                                <include>${native.oat.cpp.sources}oat-${native.os}/*.cpp</include>
+                                <include>${native.oat.cpp.sources}oat-${native.os}.${native.arch}/*.cpp</include>
+                                <include>${native.oat.cpp.sources}oat-${native.oat}/*.cpp</include>
+                            </includes>
+                        </source>
+                        <source>
+                            <directory>${jace.generated-sources}/c++</directory>
+                            <includes>
+                                <include>**/*.cpp</include>
+                            </includes>
+                        </source>
+                    </sources>
+                </configuration>
+            </plugin>
+        </plugins>
+
+    </build>
+    
+</project>
