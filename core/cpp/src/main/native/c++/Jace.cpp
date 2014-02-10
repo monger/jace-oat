@@ -526,92 +526,6 @@ void catchAndThrow(JNIEnv* env)
 	throw JNIException(msg);
 }
 
-void registerShutdownHook(JNIEnv *env) throw (JNIException)
-{
-	jclass hookClass = env->FindClass("org/jace/util/ShutdownHook");
-	if (!hookClass)
-	{
-		string msg = "Assert failed: Unable to find the class, org.jace.util.ShutdownHook.";
-		try
-		{
-			catchAndThrow(env);
-		}
-		catch (std::exception& e)
-		{
-			msg.append("\ncaused by:\n");
-			msg.append(e.what());
-		}
-		throw JNIException(msg);
-	}
-
-	jmethodID hookGetInstance = env->GetStaticMethodID(hookClass, "getInstance", "()Lorg/jace/util/ShutdownHook;");
-	if (!hookGetInstance)
-	{
-		env->DeleteLocalRef(hookClass);
-		string msg = "Assert failed: Unable to find the method, ShutdownHook.getInstance().";
-		try
-		{
-			catchAndThrow(env);
-		}
-		catch (std::exception& e)
-		{
-			msg.append("\ncaused by:\n");
-			msg.append(e.what());
-		}
-		throw JNIException(msg);
-	}
-
-	jobject hookObject = env->CallStaticObjectMethod(hookClass, hookGetInstance);
-	if (!hookObject)
-	{
-		env->DeleteLocalRef(hookClass);
-		string msg = "Unable to invoke ShutdownHook.getInstance()";
-		try
-		{
-			catchAndThrow(env);
-		}
-		catch (std::exception& e)
-		{
-			msg.append("\ncaused by:\n");
-			msg.append(e.what());
-		}
-		throw JNIException(msg);
-	}
-
-	jmethodID hookRegisterIfNecessary = env->GetMethodID(hookClass, "registerIfNecessary", "()V");
-	if (!hookRegisterIfNecessary)
-	{
-		env->DeleteLocalRef(hookObject);
-		env->DeleteLocalRef(hookClass);
-		string msg = "Unable to find the method, ShutdownHook.registerIfNecessary().";
-		try
-		{
-			catchAndThrow(env);
-		}
-		catch (std::exception& e)
-		{
-			msg.append("\ncaused by:\n");
-			msg.append(e.what());
-		}
-		throw JNIException(msg);
-	}
-
-	env->CallObjectMethodA(hookObject, hookRegisterIfNecessary, 0);
-	try
-	{
-		catchAndThrow(env);
-	}
-	catch (std::exception& e)
-	{
-		string msg = "Exception thrown invoking ShutdownHook.registerIfNecessary()\n";
-		msg.append("caused by:\n");
-		msg.append(e.what());
-		throw JNIException(msg);
-	}
-	env->DeleteLocalRef(hookObject);
-	env->DeleteLocalRef(hookClass);
-}
-
 /**
  * Attaches the current thread to the virtual machine and returns the appropriate
  * JNIEnv for the thread. If the thread is already attached, this method method
@@ -723,7 +637,6 @@ void setJavaVmImpl(JavaVM* _jvm, jint _jniVersion) throw (JNIException)
 {
 	assert(_jvm != 0);
 	JNIEnv* env = attachImpl(_jvm, _jniVersion, 0, 0, false);
-	registerShutdownHook(env);
 	jvm = _jvm;
 	jniVersion = env->GetVersion();
 }
@@ -754,23 +667,6 @@ void createVm(const VmLoader& loader,
 	setJavaVmImpl(jvm, vm_args.version);
 }
 
-/**
- * Invoked by org.jace.util.ShutdownHook on VM shutdown.
- */
-extern "C" JNIEXPORT void JNICALL Java_org_jace_util_ShutdownHook_signalVMShutdown(JNIEnv*, jclass)
-{
-	// Invoking DestroyJavaVM() from multiple threads will result in a deadlock (they will wait on each other to shut down).
-	// Typically the main thread is blocked on DestroyJavaVM() and the shutdown hook is invoked
-	// on another thread. As such, we reset jvm and jniVersion directly, without invoking DestroyJavaVM().
-	boost::mutex::scoped_lock lock(jvmMutex);
-
-	// Currently (JDK 1.7) JVM unloading is not supported. We do our best to ensure that the JVM
-	// is not used past this point.
-	jvm = 0;
-	jniVersion = 0;
-}
-
-
 void destroyVm() throw (JNIException)
 {
 	jint jniVersionBeforeShutdown;
@@ -784,6 +680,8 @@ void destroyVm() throw (JNIException)
 		}
 		jniVersionBeforeShutdown = jniVersion;
 		jvmBeforeShutdown = jvm;
+        jvm = 0;
+        jniVersion = 0;
 	}
 
 	// DestroyJavaVM()'s return value is only reliable under JDK 1.6 or newer; older versions always
@@ -966,6 +864,18 @@ void setJavaVm(JavaVM* _jvm, jint _jniVersion) throw (VirtualMachineRunningError
 	if (jvm != 0 || jniVersion != 0)
 		throw VirtualMachineRunningError("The virtual machine is already running");
 	setJavaVmImpl(_jvm, _jniVersion);
+}
+
+void resetJavaVm()
+{
+	boost::mutex::scoped_lock lock(jvmMutex);
+    if (jvm == 0)
+    {
+        // JVM already shut down
+        return;
+    }
+    jvm = 0;
+    jniVersion = 0;
 }
 
 /**

@@ -83,6 +83,12 @@ JACE_API void destroyVm() throw (JNIException);
 JACE_API void setJavaVm(JavaVM* jvm, jint jniVersion = DEFAULT_JNI_VERSION) throw(VirtualMachineRunningError, JNIException);
 
 /**
+ * Resets the current running java virtual machine.  This should be called when cleaning up if you used setJavaVm and
+ * created a custom vm outside of createVm
+ */
+JACE_API void resetJavaVm();
+
+/**
  * Returns the current java virtual machine.
  *
  * @return null if no virtual machine is running

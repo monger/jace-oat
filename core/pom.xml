@@ -28,7 +28,6 @@
 	<modules>
         <module>java</module>
         <module>cpp</module>
-        <module>runtime</module>
 	</modules>
     
     <properties>
