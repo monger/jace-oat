@@ -76,10 +76,11 @@ JACE_API void destroyVm() throw (JNIException);
  * loading policy outside of createVm.
  *
  * @param jvm a running java virtual machine
+ * @param jniVersion the desired version of the jvm (defaults DEFAULT_JNI_VERSION)
  * @throws VirtualMachineRunningError if a JVM is already running
  * @throws JNIException if an error occurs while registering the shutdown hook
  */
-JACE_API void setJavaVm(JavaVM* jvm) throw(VirtualMachineRunningError, JNIException);
+JACE_API void setJavaVm(JavaVM* jvm, jint jniVersion = DEFAULT_JNI_VERSION) throw(VirtualMachineRunningError, JNIException);
 
 /**
  * Returns the current java virtual machine.

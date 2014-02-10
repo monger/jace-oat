@@ -617,9 +617,10 @@ void registerShutdownHook(JNIEnv *env) throw (JNIException)
  * JNIEnv for the thread. If the thread is already attached, this method method
  * does nothing.
  *
- * PRECONDITION: jvm is not null and jvmMutex is locked
+ * PRECONDITION: jvm is not null, jniVersion is not 0, and jvmMutex is locked
  *
  * @param jvm the java virtual machine to attach the thread to
+ * @param jniVersion the version of the vm that we want to attach
  * @param threadGroup the ThreadGroup associated with the thread, or null
  * @param name the thread name, or null
  * @param daemon true if the thread should be attached as a daemon thread
@@ -627,7 +628,11 @@ void registerShutdownHook(JNIEnv *env) throw (JNIException)
  * @see AttachCurrentThread
  * @see AttachCurrentThreadAsDaemon
  */
-JNIEnv* attachImpl(JavaVM* jvm, const jobject threadGroup, const char* name, const bool daemon) throw (JNIException)
+JNIEnv* attachImpl(JavaVM* jvm, 
+                   jint jniVersion,
+                   const jobject threadGroup, 
+                   const char* name, 
+                   const bool daemon) throw (JNIException)
 {
 	JNIEnv* env;
 	if (jvm->GetEnv((void**) &env, jniVersion) == JNI_OK)
@@ -687,7 +692,7 @@ void classLoaderDestructor(jobject* value)
 
 	// Read the thread state
 	boost::mutex::scoped_lock lock(jvmMutex);
-	if (jvm == 0)
+	if (jvm == 0 || jniVersion == 0)
 	{
 		// JVM is already shut down
 		return;
@@ -696,7 +701,7 @@ void classLoaderDestructor(jobject* value)
 	bool isDetached = jvm->GetEnv((void**) &env, jniVersion) == JNI_EDETACHED;
 
 	if (isDetached)
-		env = attachImpl(jvm, 0, 0, false);
+		env = attachImpl(jvm, jniVersion, 0, 0, false);
 	else
 		assert(false);
 	env->DeleteGlobalRef(*value);
@@ -712,20 +717,20 @@ boost::thread_specific_ptr<jobject> threadClassLoader(classLoaderDestructor);
 /**
  * Allows createVm() and setJavaVm() to share code without recursive mutexes.
  *
- * PRECONDITION: _jvm is not null and jvmMutex is locked
+ * PRECONDITION: _jvm is not null, _jniVersion is not 0, and jvmMutex is locked
  */
-void setJavaVmImpl(JavaVM* _jvm) throw (JNIException)
+void setJavaVmImpl(JavaVM* _jvm, jint _jniVersion) throw (JNIException)
 {
 	assert(_jvm != 0);
-	JNIEnv* env = attachImpl(_jvm, 0, 0, false);
+	JNIEnv* env = attachImpl(_jvm, _jniVersion, 0, 0, false);
 	registerShutdownHook(env);
 	jvm = _jvm;
 	jniVersion = env->GetVersion();
 }
 
 void createVm(const VmLoader& loader,
-	const OptionList& options,
-	bool ignoreUnrecognized) throw (JNIException)
+	          const OptionList& options,
+	          bool ignoreUnrecognized) throw (JNIException)
 {
 	JavaVM* jvm;
 	JNIEnv* env;
@@ -746,7 +751,7 @@ void createVm(const VmLoader& loader,
 		string msg = "Unable to create the virtual machine. The error was " + toString(rc);
 		throw JNIException(msg);
 	}
-	setJavaVmImpl(jvm);
+	setJavaVmImpl(jvm, vm_args.version);
 }
 
 /**
@@ -824,9 +829,9 @@ JNIEnv* attach() throw (JNIException, VirtualMachineShutdownError)
 JNIEnv* attach(const jobject threadGroup, const char* name, const bool daemon) throw (JNIException, VirtualMachineShutdownError)
 {
 	boost::mutex::scoped_lock lock(jvmMutex);
-	if (jvm == 0)
+	if (jvm == 0 || jniVersion == 0)
 		throw VirtualMachineShutdownError("The virtual machine is shut down");
-	return attachImpl(jvm, threadGroup, name, daemon);
+	return attachImpl(jvm, jniVersion, threadGroup, name, daemon);
 }
 
 /**
@@ -951,14 +956,16 @@ JavaVM* getJavaVm()
 	return jvm;
 }
 
-void setJavaVm(JavaVM* _jvm) throw (VirtualMachineRunningError, JNIException)
+void setJavaVm(JavaVM* _jvm, jint _jniVersion) throw (VirtualMachineRunningError, JNIException)
 {
 	if (_jvm == 0)
 		throw new JNIException("jvm may not be null");
+    if (_jniVersion == 0)
+        throw new JNIException("jniVersion may not be 0");
 	boost::mutex::scoped_lock lock(jvmMutex);
-	if (jvm != 0)
+	if (jvm != 0 || jniVersion != 0)
 		throw VirtualMachineRunningError("The virtual machine is already running");
-	setJavaVmImpl(_jvm);
+	setJavaVmImpl(_jvm, _jniVersion);
 }
 
 /**
