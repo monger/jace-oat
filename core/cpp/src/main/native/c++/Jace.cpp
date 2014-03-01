@@ -973,7 +973,7 @@ void printClass(jobject obj)
 
 bool isRunning()
 {
-	boost::mutex::scoped_lock lock(jvmMutex);
+    /* Not locked, since anyone that checks this call isn't locking on the mutex */
 	return jvm != 0;
 }
 
