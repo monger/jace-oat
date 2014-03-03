@@ -67,7 +67,7 @@ BEGIN_NAMESPACE(jace)
 // We're under the assumption that there will always only be one of these.
 JavaVM* jvm = 0;
 jint jniVersion = 0;
-unsigned int threadNumber = 0;
+boost::thread::id mainThreadId;
 
 /**
  * Synchronizes access to "jvm" and "jniVersion" variables.
@@ -546,7 +546,7 @@ JNIEnv* attachImpl(JavaVM* jvm,
                    jint jniVersion,
                    const jobject threadGroup, 
                    const char* name, 
-                   const bool daemon) throw (JNIException)
+                   const Daemon daemon) throw (JNIException)
 {
 	JNIEnv* env;
 	if (jvm->GetEnv((void**) &env, jniVersion) == JNI_OK)
@@ -579,7 +579,8 @@ JNIEnv* attachImpl(JavaVM* jvm,
 	}
 	args.group = threadGroup;
 	jint result;
-	if (!daemon) {
+	if (daemon == NON_DAEMON || 
+        (daemon == AUTO && (mainThreadId == boost::thread::id() || mainThreadId == boost::this_thread::get_id()))) {
 		result = jvm->AttachCurrentThread(JACE_ENV_CAST &env, &args);
 	} else {
 		result = jvm->AttachCurrentThreadAsDaemon(JACE_ENV_CAST &env, &args);
@@ -606,7 +607,7 @@ void classLoaderDestructor(jobject* value)
 
 	// Read the thread state
 	boost::mutex::scoped_lock lock(jvmMutex);
-	if (jvm == 0 || jniVersion == 0)
+	if (jvm == 0 || jniVersion == 0 || mainThreadId == boost::thread::id())
 	{
 		// JVM is already shut down
 		return;
@@ -615,7 +616,7 @@ void classLoaderDestructor(jobject* value)
 	bool isDetached = jvm->GetEnv((void**) &env, jniVersion) == JNI_EDETACHED;
 
 	if (isDetached)
-		env = attachImpl(jvm, jniVersion, 0, 0, false);
+		env = attachImpl(jvm, jniVersion, 0, 0, NON_DAEMON);
 	else
 		assert(false);
 	env->DeleteGlobalRef(*value);
@@ -636,9 +637,10 @@ boost::thread_specific_ptr<jobject> threadClassLoader(classLoaderDestructor);
 void setJavaVmImpl(JavaVM* _jvm, jint _jniVersion) throw (JNIException)
 {
 	assert(_jvm != 0);
-	JNIEnv* env = attachImpl(_jvm, _jniVersion, 0, 0, false);
+	JNIEnv* env = attachImpl(_jvm, _jniVersion, 0, 0, NON_DAEMON);
 	jvm = _jvm;
 	jniVersion = env->GetVersion();
+    mainThreadId = boost::this_thread::get_id();
 }
 
 void createVm(const VmLoader& loader,
@@ -682,6 +684,7 @@ void destroyVm() throw (JNIException)
 		jvmBeforeShutdown = jvm;
         jvm = 0;
         jniVersion = 0;
+        mainThreadId = boost::thread::id();
 	}
 
 	// DestroyJavaVM()'s return value is only reliable under JDK 1.6 or newer; older versions always
@@ -708,7 +711,7 @@ void destroyVm() throw (JNIException)
  */
 JNIEnv* attach() throw (JNIException, VirtualMachineShutdownError)
 {
-	return attach(0, 0, false);
+	return attach(0, 0, AUTO);
 }
 
 /**
@@ -724,10 +727,10 @@ JNIEnv* attach() throw (JNIException, VirtualMachineShutdownError)
  * @see AttachCurrentThread
  * @see AttachCurrentThreadAsDaemon
  */
-JNIEnv* attach(const jobject threadGroup, const char* name, const bool daemon) throw (JNIException, VirtualMachineShutdownError)
+JNIEnv* attach(const jobject threadGroup, const char* name, const Daemon daemon) throw (JNIException, VirtualMachineShutdownError)
 {
 	boost::mutex::scoped_lock lock(jvmMutex);
-	if (jvm == 0 || jniVersion == 0)
+	if (jvm == 0 || jniVersion == 0 || mainThreadId == boost::thread::id())
 		throw VirtualMachineShutdownError("The virtual machine is shut down");
 	return attachImpl(jvm, jniVersion, threadGroup, name, daemon);
 }
@@ -876,6 +879,7 @@ void resetJavaVm()
     }
     jvm = 0;
     jniVersion = 0;
+    mainThreadId = boost::thread::id();
 }
 
 /**

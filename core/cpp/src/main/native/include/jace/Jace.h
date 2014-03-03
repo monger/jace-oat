@@ -39,6 +39,21 @@ END_NAMESPACE_2(jace, proxy)
 
 BEGIN_NAMESPACE(jace)
 
+JACE_API enum Daemon {
+	/**
+	 * Attach as non-daemon
+	 */
+	NON_DAEMON,
+	/**
+	 * Attach as daemon
+	 */
+	DAEMON,
+	/**
+	 * Attach as daemon if this is not the main thread
+	 */
+	AUTO
+};
+
 /**
  * Creates a new Java Virtual Machine using the specified loader
  * with the specified options.
@@ -126,7 +141,7 @@ JACE_API JNIEnv* attach() throw (JNIException, VirtualMachineShutdownError);
  * @throws JNIException if an error occurs while trying to attach the current thread.
  * @throws VirtualMachineShutdownError if the virtual machine is not running
  */
-JACE_API JNIEnv* attach(const jobject threadGroup, const char* name, const bool daemon)
+JACE_API JNIEnv* attach(const jobject threadGroup, const char* name, const Daemon daemon)
 	throw (JNIException, VirtualMachineShutdownError);
 
 
