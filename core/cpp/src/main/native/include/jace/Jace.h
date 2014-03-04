@@ -110,6 +110,10 @@ JACE_API void resetJavaVm();
  */
 JACE_API JavaVM* getJavaVm();
 
+/**
+ * Destroys the VM if we created it, or resets it if it was just set
+ */
+JACE_API void cleanup();
 
 /**
  * Attaches the current thread to the virtual machine and returns the appropriate

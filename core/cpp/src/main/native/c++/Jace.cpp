@@ -53,26 +53,23 @@ using std::wstring;
 #include <boost/shared_ptr.hpp>
 #include "jace/BoostWarningOn.h"
 
-#ifdef WIN32
-#include <windows.h>
-#elif !defined(__ANDROID__)
-#include <sys/types.h>
-#include <sys/syscall.h>
-#endif
-
-
 BEGIN_NAMESPACE(jace)
 
 // A reference to the java virtual machine.
 // We're under the assumption that there will always only be one of these.
 JavaVM* jvm = 0;
 jint jniVersion = 0;
+bool created = false;
 boost::thread::id mainThreadId;
 
 /**
  * Synchronizes access to "jvm" and "jniVersion" variables.
  */
-boost::mutex jvmMutex;
+boost::shared_mutex jvmMtx;
+typedef boost::shared_lock<boost::shared_mutex>             auto_read_lock;
+typedef boost::unique_lock<boost::shared_mutex>             auto_write_lock;
+typedef boost::upgrade_lock<boost::shared_mutex>            auto_upgrade_lock;
+typedef boost::upgrade_to_unique_lock<boost::shared_mutex>  auto_upgrade_unique_lock;
 
 // The map of all of the java class factories.
 typedef map<string,JFactory*> FactoryMap;
@@ -531,7 +528,7 @@ void catchAndThrow(JNIEnv* env)
  * JNIEnv for the thread. If the thread is already attached, this method method
  * does nothing.
  *
- * PRECONDITION: jvm is not null, jniVersion is not 0, and jvmMutex is locked
+ * PRECONDITION: jvm is not null, jniVersion is not 0, and jvmMtx is read-locked
  *
  * @param jvm the java virtual machine to attach the thread to
  * @param jniVersion the version of the vm that we want to attach
@@ -569,7 +566,7 @@ JNIEnv* attachImpl(JavaVM* jvm,
 	else
 	{
 		string temp("NativeThread-");
-		temp += toString(getCurrentThreadId());
+		temp += toString(boost::this_thread::get_id());
 #ifdef JACE_VM_ARGS_CONST_NAME
         args.name = temp.c_str();
 #else
@@ -602,11 +599,12 @@ JNIEnv* attachImpl(JavaVM* jvm,
 void classLoaderDestructor(jobject* value)
 {
 	// Invoked by setClassLoader() or when the thread exits
-	if (value == 0)
+	if (value == 0) {
 		return;
+    }
 
 	// Read the thread state
-	boost::mutex::scoped_lock lock(jvmMutex);
+    auto_read_lock readLock(jvmMtx);
 	if (jvm == 0 || jniVersion == 0 || mainThreadId == boost::thread::id())
 	{
 		// JVM is already shut down
@@ -615,16 +613,18 @@ void classLoaderDestructor(jobject* value)
 	JNIEnv* env;
 	bool isDetached = jvm->GetEnv((void**) &env, jniVersion) == JNI_EDETACHED;
 
-	if (isDetached)
+	if (isDetached) {
 		env = attachImpl(jvm, jniVersion, 0, 0, NON_DAEMON);
-	else
+	} else {
 		assert(false);
+    }
 	env->DeleteGlobalRef(*value);
 	delete[] value;
 
 	// Restore the thread state
-	if (isDetached)
+	if (isDetached) {
 		detach();
+    }
 }
 
 boost::thread_specific_ptr<jobject> threadClassLoader(classLoaderDestructor);
@@ -632,15 +632,20 @@ boost::thread_specific_ptr<jobject> threadClassLoader(classLoaderDestructor);
 /**
  * Allows createVm() and setJavaVm() to share code without recursive mutexes.
  *
- * PRECONDITION: _jvm is not null, _jniVersion is not 0, and jvmMutex is locked
+ * PRECONDITION: _jvm is not null, _jniVersion is not 0, and jvmMtx is locked with the upgrade lock
  */
-void setJavaVmImpl(JavaVM* _jvm, jint _jniVersion) throw (JNIException)
+void setJavaVmImpl(JavaVM* _jvm, jint _jniVersion, bool _created, auto_upgrade_lock& upgradeLock) throw (JNIException)
 {
 	assert(_jvm != 0);
 	JNIEnv* env = attachImpl(_jvm, _jniVersion, 0, 0, NON_DAEMON);
-	jvm = _jvm;
-	jniVersion = env->GetVersion();
-    mainThreadId = boost::this_thread::get_id();
+    
+    {
+        auto_upgrade_unique_lock writeLock(upgradeLock);
+	    jvm = _jvm;
+	    jniVersion = env->GetVersion();
+        created = _created;
+        mainThreadId = boost::this_thread::get_id();
+    }
 }
 
 void createVm(const VmLoader& loader,
@@ -657,16 +662,18 @@ void createVm(const VmLoader& loader,
 	vm_args.nOptions = jint(options.size());
 	vm_args.ignoreUnrecognized = ignoreUnrecognized;
 
-	boost::mutex::scoped_lock lock(jvmMutex);
-	jint rc = loader.createJavaVM(&jvm, reinterpret_cast<void**>(&env), &vm_args);
-	options.destroyJniOptions(jniOptions);
+    {
+        auto_upgrade_lock upgradeLock(jvmMtx);
+    	jint rc = loader.createJavaVM(&jvm, reinterpret_cast<void**>(&env), &vm_args);
+    	options.destroyJniOptions(jniOptions);
 
-	if (rc != 0)
-	{
-		string msg = "Unable to create the virtual machine. The error was " + toString(rc);
-		throw JNIException(msg);
-	}
-	setJavaVmImpl(jvm, vm_args.version);
+    	if (rc != 0)
+    	{
+    		string msg = "Unable to create the virtual machine. The error was " + toString(rc);
+    		throw JNIException(msg);
+    	}
+    	setJavaVmImpl(jvm, vm_args.version, true, upgradeLock);
+    }
 }
 
 void destroyVm() throw (JNIException)
@@ -674,7 +681,7 @@ void destroyVm() throw (JNIException)
 	jint jniVersionBeforeShutdown;
 	JavaVM* jvmBeforeShutdown;
 	{
-		boost::mutex::scoped_lock lock(jvmMutex);
+        auto_upgrade_lock upgradeLock(jvmMtx);
 		if (jvm == 0)
 		{
 			// JVM already shut down
@@ -682,9 +689,13 @@ void destroyVm() throw (JNIException)
 		}
 		jniVersionBeforeShutdown = jniVersion;
 		jvmBeforeShutdown = jvm;
-        jvm = 0;
-        jniVersion = 0;
-        mainThreadId = boost::thread::id();
+        
+        {
+            auto_upgrade_unique_lock writeLock(upgradeLock);
+            jvm = 0;
+            jniVersion = 0;
+            mainThreadId = boost::thread::id();
+        }
 	}
 
 	// DestroyJavaVM()'s return value is only reliable under JDK 1.6 or newer; older versions always
@@ -692,8 +703,9 @@ void destroyVm() throw (JNIException)
 	//
 	// NOTE: DestroyJavaVM() will block until the shutdown hook finishes executing
 	jint result = jvmBeforeShutdown->DestroyJavaVM();
-	if (jniVersionBeforeShutdown >= JNI_VERSION_1_6 && result != JNI_OK)
+	if (jniVersionBeforeShutdown >= JNI_VERSION_1_6 && result != JNI_OK) {
 		throw JNIException("DestroyJavaVM() returned " + toString(result));
+    }
 }
 
 
@@ -729,9 +741,10 @@ JNIEnv* attach() throw (JNIException, VirtualMachineShutdownError)
  */
 JNIEnv* attach(const jobject threadGroup, const char* name, const Daemon daemon) throw (JNIException, VirtualMachineShutdownError)
 {
-	boost::mutex::scoped_lock lock(jvmMutex);
-	if (jvm == 0 || jniVersion == 0 || mainThreadId == boost::thread::id())
+    auto_read_lock readLock(jvmMtx);
+	if (jvm == 0 || jniVersion == 0 || mainThreadId == boost::thread::id()) {
 		throw VirtualMachineShutdownError("The virtual machine is shut down");
+    }
 	return attachImpl(jvm, jniVersion, threadGroup, name, daemon);
 }
 
@@ -740,7 +753,7 @@ JNIEnv* attach(const jobject threadGroup, const char* name, const Daemon daemon)
  */
 void detach() throw ()
 {
-	boost::mutex::scoped_lock lock(jvmMutex);
+    auto_read_lock readLock(jvmMtx);
 	if (jvm == 0)
 	{
 		// The JVM is already shut down
@@ -859,27 +872,48 @@ JavaVM* getJavaVm()
 
 void setJavaVm(JavaVM* _jvm, jint _jniVersion) throw (VirtualMachineRunningError, JNIException)
 {
-	if (_jvm == 0)
+	if (_jvm == 0) {
 		throw new JNIException("jvm may not be null");
-    if (_jniVersion == 0)
+    }
+    if (_jniVersion == 0) {
         throw new JNIException("jniVersion may not be 0");
-	boost::mutex::scoped_lock lock(jvmMutex);
-	if (jvm != 0 || jniVersion != 0)
-		throw VirtualMachineRunningError("The virtual machine is already running");
-	setJavaVmImpl(_jvm, _jniVersion);
+    }
+    {
+        auto_upgrade_lock upgradeLock(jvmMtx);
+	    if (jvm != 0 || jniVersion != 0) {
+		    throw VirtualMachineRunningError("The virtual machine is already running");
+        }
+	    setJavaVmImpl(_jvm, _jniVersion, false, upgradeLock);
+    }
 }
 
 void resetJavaVm()
 {
-	boost::mutex::scoped_lock lock(jvmMutex);
+	auto_upgrade_lock upgradeLock(jvmMtx);
     if (jvm == 0)
     {
         // JVM already shut down
         return;
     }
-    jvm = 0;
-    jniVersion = 0;
-    mainThreadId = boost::thread::id();
+    {
+        auto_upgrade_unique_lock writeLock(upgradeLock);
+        jvm = 0;
+        jniVersion = 0;
+        mainThreadId = boost::thread::id();
+    }
+}
+
+void cleanup() {
+    if (created) {
+        try {
+            destroyVm();
+        } catch (JNIException& e) {
+            cerr << "Exception shutting down: " << e.what() << endl;
+            resetJavaVm();
+        }
+    } else {
+        resetJavaVm();
+    }
 }
 
 /**
@@ -977,19 +1011,13 @@ void printClass(jobject obj)
 
 bool isRunning()
 {
-    /* Not locked, since anyone that checks this call isn't locking on the mutex */
-	return jvm != 0;
-}
-
-string getCurrentThreadId()
-{
-#ifdef _WIN32
-	return toString(GetCurrentThreadId());
-#elif defined(__ANDROID__)
-    return toString(gettid());
-#else
-	return toString(syscall(SYS_gettid));
-#endif
+    /* Try and get the lock - if it fails, then we are not running */
+    try {
+        auto_read_lock readLock(jvmMtx);
+        return jvm != 0;
+    } catch (...) {
+        return false;
+    }
 }
 
 END_NAMESPACE(jace)
