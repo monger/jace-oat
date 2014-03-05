@@ -16,7 +16,7 @@ string unwrapException(const string& msg) {
 /**
  * Invoked by org.jace.util.ShutdownHook on VM shutdown.
  */
-static void org_jace_util_ShutdownHook_signalVMShutdown(JNIEnv*, jclass) {
+static void native_signalVMShutdown(JNIEnv*, jclass) {
     jace::cleanup();
 }
 
@@ -31,7 +31,7 @@ void registerShutdownHook() throw (JNIException)
         THROW_JNI_EXCEPTION("Assert failed: Unable to find the class, org.jace.util.ShutdownHook.");
 	}
 
-    void(*pf)(JNIEnv*, jclass) = org_jace_util_ShutdownHook_signalVMShutdown;
+    void(*pf)(JNIEnv*, jclass) = native_signalVMShutdown;
     JNINativeMethod methods[] = { { (char*) "signalVMShutdown", (char*) "()V", *(void**)(&pf) } };
     int methods_size = sizeof(methods) / sizeof(methods[0]);
     if (env->RegisterNatives(hookClass, methods, methods_size) != JNI_OK) {
