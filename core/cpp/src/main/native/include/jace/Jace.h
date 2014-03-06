@@ -500,6 +500,13 @@ template <typename T> T java_cast(const ::jace::proxy::JObject& obj)
 	throw JNIException(msg);
 }
 
+/** Throws a java exception with the given message */
+void java_throw(const std::string& internalName, const std::string& message);
+
+template <typename T> void java_throw(const std::string& message) {
+    java_throw(T::staticGetJavaJniClass().getInternalName(), message);
+}
+
 /**
  * Equal to Java's instanceof keyword.
  * Returns true if obj is non-null and can be cast to type T.

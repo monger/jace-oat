@@ -938,6 +938,16 @@ void setClassLoader(jobject classLoader)
 	}
 }
 
+void java_throw(const std::string& internalName, const std::string& message) {
+    JNIEnv* env = attach();
+    jclass exClass = env->FindClass(internalName.c_str());
+    if (!exClass) {
+        THROW_JNI_EXCEPTION("Could not find class " + internalName);
+    }
+    env->ThrowNew(exClass, message.c_str());
+    deleteLocalRef(env, exClass);
+}
+
 string toString(jobject obj)
 {
 	JNIEnv* env = attach();
