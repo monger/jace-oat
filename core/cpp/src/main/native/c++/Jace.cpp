@@ -523,6 +523,10 @@ void catchAndThrow(JNIEnv* env)
 	throw JNIException(msg);
 }
 
+
+void threadDetacher(JNIEnv**) { detach(); }
+boost::thread_specific_ptr<JNIEnv*> attachedJni(threadDetacher);
+
 /**
  * Attaches the current thread to the virtual machine and returns the appropriate
  * JNIEnv for the thread. If the thread is already attached, this method method
@@ -581,6 +585,10 @@ JNIEnv* attachImpl(JavaVM* jvm,
 		result = jvm->AttachCurrentThread(JACE_ENV_CAST &env, &args);
 	} else {
 		result = jvm->AttachCurrentThreadAsDaemon(JACE_ENV_CAST &env, &args);
+    }
+    if (mainThreadId != boost::this_thread::get_id()) {
+        /* Attach our env to this thread so that we can auto-detach */
+        attachedJni.reset(&env);
     }
 #ifndef JACE_VM_ARGS_CONST_NAME
     delete[] args.name;
@@ -760,6 +768,8 @@ void detach() throw ()
 		return;
 	}
 	jvm->DetachCurrentThread();
+    /* Release instead of reset so we don't keep getting called */
+    attachedJni.release();
 }
 
 
