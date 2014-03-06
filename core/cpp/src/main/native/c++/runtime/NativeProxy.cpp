@@ -21,8 +21,9 @@ typedef boost::unique_lock<boost::mutex> auto_lock;
 /**
  * Invoked by org.jace.util.NativeInvocation.
  */
-static jobject native_invokeNative(JNIEnv* env, jclass cls, jobject obj, jlong ref, jobjectArray args) {
-    return ((Builder::Fx) ref)(env, cls, obj, args);
+static jobject native_invokeNative(JNIEnv* env, jclass cls, jlong ref, jint idx, jobject obj, jobjectArray args) {
+    Builder*    pBuilder = (Builder*) ref;
+    return pBuilder->get(idx)(env, cls, obj, args);
 }
 
 /**
@@ -39,10 +40,10 @@ static void registerInvokeNativeHook() throw (JNIException)
         THROW_JNI_EXCEPTION("Assert failed: Unable to find the class, org.jace.util.NativeInvocation.");
     }
 
-    jobject(*pf)(JNIEnv*, jclass, jobject, jlong, jobjectArray) = native_invokeNative;
+    jobject(*pf)(JNIEnv*, jclass, jlong, jint, jobject, jobjectArray) = native_invokeNative;
     JNINativeMethod methods[] = { 
         { (char*) "invokeNative", 
-          (char*) "(Ljava/lang/Object;J[Ljava/lang/Object;)Ljava/lang/Object;", 
+          (char*) "(JILjava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;", 
           *(void**)(&pf) } 
     };
     int methods_size = sizeof(methods) / sizeof(methods[0]);
@@ -66,7 +67,7 @@ Builder::Builder(const std::string& className) throw (JNIException) {
         THROW_JNI_EXCEPTION("Assert failed: Unable to find the class, org.jace.util.NativeInvocation.");
     }
     
-	m_registerCallbackMethod = env->GetMethodID(instClass, "registerNative", "(Ljava/lang/String;J)V");
+	m_registerCallbackMethod = env->GetMethodID(instClass, "registerNative", "(Ljava/lang/String;JI)V");
 	if (!m_registerCallbackMethod) {
 		env->DeleteLocalRef(instClass);
         THROW_JNI_EXCEPTION("Assert failed: Unable to find the method, NativeInvocation.registerNative().");
@@ -108,8 +109,7 @@ Builder::~Builder() {
     deleteGlobalRef(env, m_instance);
 }
 
-void Builder::registerCallback(const std::string& name, const Fx callback) {
-    intptr_t ptr = (intptr_t) callback;
+void Builder::registerCallback(const std::string& name, const Callback& callback) {
     JNIEnv* env = attach();
     
     jstring javaString = env->NewStringUTF(name.c_str());
@@ -117,7 +117,11 @@ void Builder::registerCallback(const std::string& name, const Fx callback) {
         THROW_JNI_EXCEPTION("Assert failed: Error creating java string.");
     }
     
-    env->CallVoidMethod(m_instance, m_registerCallbackMethod, javaString, (jlong) ptr);
+    env->CallVoidMethod(m_instance, 
+                        m_registerCallbackMethod, 
+                        javaString, 
+                        (jlong) ((intptr_t) this), 
+                        (jint) m_callbacks.size());
     try {
         jace::catchAndThrow();
 	} catch (std::exception& e) {
@@ -127,7 +131,7 @@ void Builder::registerCallback(const std::string& name, const Fx callback) {
 		msg.append(e.what());
 		throw JNIException(msg);
 	}
-    
+    m_callbacks.push_back(callback);
     env->DeleteLocalRef(javaString);
 }
 

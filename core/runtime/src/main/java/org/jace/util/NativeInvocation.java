@@ -11,7 +11,7 @@ public class NativeInvocation implements InvocationHandler {
     private final Class clazz;
     
     /** A mapping of our methods to references */
-    private final Map<String, Long> methodMap = new HashMap<String, Long>();
+    private final Map<String, Callback> callbackMap = new HashMap<String, Callback>();
     
     /**
      * Constructs a new invocation
@@ -23,8 +23,8 @@ public class NativeInvocation implements InvocationHandler {
     /**
      * Registers a method
      */
-    public void registerNative(final String name, final long ref) { 
-        methodMap.put(name, ref);
+    public void registerNative(final String name, final long ref, final int idx) { 
+        callbackMap.put(name, new Callback(ref, idx));
     }
     
 	/**
@@ -35,14 +35,27 @@ public class NativeInvocation implements InvocationHandler {
 	}
 
     @Override public Object invoke(final Object proxy, final Method method, final Object[] args) {
-        if (!methodMap.containsKey(method.getName())) {
-            throw new IllegalStateException("No method " + method.getName() + " registered");
+        if (!callbackMap.containsKey(method.getName())) {
+            throw new UnsupportedOperationException("No method " + method.getName() + " registered");
         }
-        return invokeNative(proxy, methodMap.get(method.getName()), args);
+        Callback c = callbackMap.get(method.getName());
+        return invokeNative(c.ref, c.idx, proxy, args);
     }
 
 	/**
 	 * The native callback our invocation handler makes
 	 */
-	private native Object invokeNative(final Object proxy, final long ref, final Object[] args);
+	private native Object invokeNative(final long ref, final int idx, final Object proxy, final Object[] args);
+    
+    /**
+     * A class to hold our callback information
+     */
+    private class Callback {
+        final long ref;
+        final int idx;
+        private Callback(final long ref, final int idx) { 
+            this.ref = ref;
+            this.idx = idx;
+        }
+    }
 }
