@@ -413,7 +413,7 @@ public class ProxyGenerator
 				output.write("JMethod< ");
 				output.write("::" + returnType.getFullyQualifiedName("::"));
 				output.write(" >");
-				output.write("(\"" + methodName + "\").invoke(");
+				output.write("(\"" + method.getName() + "\").invoke(");
 
 				// If this method is static, we need to provide the class info, otherwise we provide a reference to itself.
 				if (method.getAccessFlags().contains(MethodAccessFlag.STATIC))
@@ -709,7 +709,7 @@ public class ProxyGenerator
 
 			output.write(modifiers + proxyType + " " + className + "::" + name + "()" + newLine);
 			output.write("{" + newLine);
-			output.write("  return " + fieldType + "(\"" + name + "\").get(");
+			output.write("  return " + fieldType + "(\"" + field.getName() + "\").get(");
 
 			// if this field is static, we need to provide the class info, otherwise we provide a reference to itself
 			if (accessFlagSet.contains(FieldAccessFlag.STATIC))
