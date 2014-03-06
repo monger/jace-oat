@@ -845,18 +845,8 @@ void catchAndThrow()
 
 	if (!handleID)
 	{
-		string msg = "Unable to locate the method, \"jaceGetNativeHandle\".\n" \
-			"The class has not been properly enhanced.";
-		try
-		{
-			catchAndThrow();
-		}
-		catch (JNIException& e)
-		{
-			msg.append("\ncaused by:\n");
-			msg.append(e.what());
-		}
-		throw JNIException(msg);
+        THROW_JNI_EXCEPTION("Unable to locate the method, \"jaceGetNativeHandle\".\n"
+			                "The class has not been properly enhanced.");
 	}
 
 	jlong nativeHandle = env->CallLongMethod(jPeer, handleID);
@@ -955,33 +945,13 @@ string toString(jobject obj)
 
 	if (!objectClass)
 	{
-		string msg = "Assert failed: Unable to find the class, java.lang.Object.";
-		try
-		{
-			catchAndThrow();
-		}
-		catch (JNIException& e)
-		{
-			msg.append("\ncaused by:\n");
-			msg.append(e.what());
-		}
-		throw JNIException(msg);
+        THROW_JNI_EXCEPTION("Assert failed: Unable to find the class, java.lang.Object.");
 	}
 
 	jmethodID toString = env->GetMethodID(objectClass, "toString", "()Ljava/lang/String;");
 	if (!toString)
 	{
-		string msg = "Assert failed: Unable to find the method, Object.toString().";
-		try
-		{
-			catchAndThrow();
-		}
-		catch (JNIException& e)
-		{
-			msg.append("\ncaused by:\n");
-			msg.append(e.what());
-		}
-		throw JNIException(msg);
+        THROW_JNI_EXCEPTION("Assert failed: Unable to find the method, Object.toString().");
 	}
 
 	jstring javaStr = static_cast<jstring>(env->CallObjectMethod(obj, toString));

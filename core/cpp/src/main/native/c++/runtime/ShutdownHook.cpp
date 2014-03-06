@@ -6,13 +6,6 @@ using std::string;
 
 BEGIN_NAMESPACE_3(jace, runtime, ShutdownHook)
 
-string unwrapException(const string& msg) {
-    try { jace::catchAndThrow(); }
-    catch (std::exception& e) { return msg + "\ncaused by:\n" + e.what(); }
-    return msg;
-}
-#define THROW_JNI_EXCEPTION(m) throw JNIException(unwrapException(m))
-
 /**
  * Invoked by org.jace.util.ShutdownHook on VM shutdown.
  */

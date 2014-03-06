@@ -212,6 +212,14 @@ JACE_API void enlist(JFactory* factory);
  */
 JACE_API void catchAndThrow();
 
+/** Throws a "pretty-printed" exception */
+inline std::string unwrapException(const std::string& msg) {
+    try { jace::catchAndThrow(); }
+    catch (std::exception& e) { return msg + "\ncaused by:\n" + e.what(); }
+    return msg;
+}
+#define THROW_JNI_EXCEPTION(m) throw JNIException(unwrapException(m))
+
 /**
  * Returns the Peer for a given java Peer.
  */

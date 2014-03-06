@@ -18,13 +18,6 @@ bool registered = false;
 boost::mutex regMtx;
 typedef boost::unique_lock<boost::mutex> auto_lock;
 
-string unwrapException(const string& msg) {
-    try { jace::catchAndThrow(); }
-    catch (std::exception& e) { return msg + "\ncaused by:\n" + e.what(); }
-    return msg;
-}
-#define THROW_JNI_EXCEPTION(m) throw JNIException(unwrapException(m))
-
 /**
  * Invoked by org.jace.util.NativeInvocation.
  */
