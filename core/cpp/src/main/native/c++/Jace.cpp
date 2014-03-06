@@ -991,13 +991,8 @@ void printClass(jobject obj)
 
 bool isRunning()
 {
-    /* Try and get the lock - if it fails, then we are not running */
-    try {
-        auto_read_lock readLock(jvmMtx);
-        return jvm != 0;
-    } catch (...) {
-        return false;
-    }
+    /* Not locked, since anyone that checks this call isn't locking on the mutex */
+	return jvm != 0;
 }
 
 END_NAMESPACE(jace)
