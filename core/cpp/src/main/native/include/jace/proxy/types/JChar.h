@@ -21,6 +21,10 @@ BEGIN_NAMESPACE_3(jace, proxy, types)
 class JChar : public JValue
 {
 public:
+    /** Typedefs for this object */
+    typedef jchar       JNIType;
+    static const char*  ClassName;
+
 	/**
 	 * Creates a new JChar with the given value.
 	 */
@@ -29,7 +33,7 @@ public:
 	/**
 	 * Creates a new JChar with the given value.
 	 */
-	JACE_API JChar(jchar _char);
+	JACE_API JChar(JNIType _char);
 
 	/**
 	 * Destroys the existing java object.
@@ -39,7 +43,7 @@ public:
 	/**
 	 * Returns the char value of this java char.
 	 */
-	JACE_API operator jchar() const;
+	JACE_API operator JNIType() const;
 
 	/**
 	 * Compares this instance to another.
@@ -54,12 +58,12 @@ public:
 	/**
 	 * Compares this instance to another.
 	 */
-	JACE_API bool operator==(jchar val) const;
+	JACE_API bool operator==(JNIType val) const;
 
 	/**
 	 * Compares this instance to another.
 	 */
-	JACE_API bool operator!=(jchar val) const;
+	JACE_API bool operator!=(JNIType val) const;
 
 	/**
 	 * Returns the JClass for this class.

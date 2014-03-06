@@ -19,6 +19,10 @@ BEGIN_NAMESPACE_3(jace, proxy, types)
 class JByte : public ::jace::proxy::JValue
 {
 public:
+    /** Typedefs for this object */
+    typedef jbyte       JNIType;
+    static const char*  ClassName;
+
 	/**
 	 * Creates a new JByte with the given value.
 	 */
@@ -27,7 +31,7 @@ public:
 	/**
 	 * Creates a new JByte with the given value.
 	 */
-	JACE_API JByte(jbyte byte);
+	JACE_API JByte(JNIType byte);
 
 	/**
 	 * Destroys the existing java object.
@@ -37,7 +41,7 @@ public:
 	/**
 	 * Returns the byte value of this java byte.
 	 */
-	JACE_API operator jbyte() const;
+	JACE_API operator JNIType() const;
 
 	/**
 	 * Compares this JByte to another.
@@ -51,14 +55,14 @@ public:
 
 
 	/**
-	 * Compares this JByte to a jbyte.
+	 * Compares this JByte to a JNIType.
 	 */
-	JACE_API bool operator==(jbyte val) const;
+	JACE_API bool operator==(JNIType val) const;
 
 	/**
-	 * Compares this JByte to a jbyte.
+	 * Compares this JByte to a JNIType.
 	 */
-	JACE_API bool operator!=(jbyte val) const;
+	JACE_API bool operator!=(JNIType val) const;
 
 	/**
 	 * Returns the JClass for this class.

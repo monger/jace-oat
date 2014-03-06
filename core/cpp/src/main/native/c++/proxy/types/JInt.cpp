@@ -17,7 +17,7 @@ JInt::JInt(jvalue value)
   setJavaJniValue(value);
 }
 
-JInt::JInt(const jint _int)
+JInt::JInt(const JNIType _int)
 {
   jvalue value;
   value.i = _int;
@@ -35,14 +35,14 @@ JInt::JInt(const JByte& _byte)
 JInt::~JInt()
 {}
 
-JInt::operator jint() const
+JInt::operator JNIType() const
 { 
   return static_cast<jvalue>(*this).i; 
 }
 
 bool JInt::operator==(const JInt& _int) const
 {
-  return static_cast<jint>(_int) == static_cast<jint>(*this);
+  return static_cast<JNIType>(_int) == static_cast<JNIType>(*this);
 }
 
 bool JInt::operator!=(const JInt& _int) const
@@ -50,12 +50,12 @@ bool JInt::operator!=(const JInt& _int) const
   return !(*this == _int);
 }
 
-bool JInt::operator==(jint val) const
+bool JInt::operator==(JNIType val) const
 {
-  return val == static_cast<jint>(*this);
+  return val == static_cast<JNIType>(*this);
 }
 
-bool JInt::operator!=(jint val) const
+bool JInt::operator!=(JNIType val) const
 {
   return !(*this == val);
 }
@@ -77,7 +77,9 @@ const JClass& JInt::getJavaJniClass() const throw (JNIException)
 
 ostream& operator<<(ostream& stream, const JInt& val)
 {
-  return stream << static_cast<jint>(val);
+  return stream << static_cast<JInt::JNIType>(val);
 }
+
+const char* JInt::ClassName = "Integer";
 
 END_NAMESPACE_3(jace, proxy, types)

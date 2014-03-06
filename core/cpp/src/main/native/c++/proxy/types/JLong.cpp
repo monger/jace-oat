@@ -14,7 +14,7 @@ JLong::JLong(jvalue value)
   setJavaJniValue(value);
 }
 
-JLong::JLong(jlong _long)
+JLong::JLong(JNIType _long)
 {
   jvalue value;
   value.j = _long;
@@ -32,14 +32,14 @@ JLong::JLong(const JInt& _int)
 JLong::~JLong()
 {}
 
-JLong::operator jlong() const
+JLong::operator JNIType() const
 {
   return static_cast<jvalue>(*this).j;
 }
 
 bool JLong::operator==(const JLong& _long) const
 {
-  return static_cast<jlong>(_long) == static_cast<jlong>(*this);
+  return static_cast<JNIType>(_long) == static_cast<JNIType>(*this);
 }
 
 bool JLong::operator!=(const JLong& _long) const
@@ -47,12 +47,12 @@ bool JLong::operator!=(const JLong& _long) const
   return !(*this == _long);
 }
 
-bool JLong::operator==(jlong val) const
+bool JLong::operator==(JNIType val) const
 {
-  return val == static_cast<jlong>(*this);
+  return val == static_cast<JNIType>(*this);
 }
 
-bool JLong::operator!=(jlong val) const
+bool JLong::operator!=(JNIType val) const
 {
   return !(*this == val);
 }
@@ -71,5 +71,7 @@ const JClass& JLong::getJavaJniClass() const throw (JNIException)
 {
   return JLong::staticGetJavaJniClass();
 }
+
+const char* JLong::ClassName = "Long";
 
 END_NAMESPACE_3(jace, proxy, types)

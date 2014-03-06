@@ -13,7 +13,7 @@ JBoolean::JBoolean(jvalue value)
   setJavaJniValue(value);
 }
 
-JBoolean::JBoolean(jboolean _boolean)
+JBoolean::JBoolean(JNIType _boolean)
 {
   jvalue value;
   value.z = _boolean;
@@ -23,14 +23,14 @@ JBoolean::JBoolean(jboolean _boolean)
 JBoolean::~JBoolean()
 {}
 
-JBoolean::operator jboolean() const
+JBoolean::operator JNIType() const
 { 
   return static_cast<jvalue>(*this).z;
 }
 
 bool JBoolean::operator==(const JBoolean& _boolean) const
 {
-  return static_cast<jboolean>(_boolean) == static_cast<jboolean>(*this);
+  return static_cast<JNIType>(_boolean) == static_cast<JNIType>(*this);
 }
 
 bool JBoolean::operator!=(const JBoolean& _boolean) const
@@ -38,12 +38,12 @@ bool JBoolean::operator!=(const JBoolean& _boolean) const
   return !(*this == _boolean);
 }
 
-bool JBoolean::operator==(jboolean val) const
+bool JBoolean::operator==(JNIType val) const
 {
-  return val == static_cast<jboolean>(*this);
+  return val == static_cast<JNIType>(*this);
 }
 
-bool JBoolean::operator!=(jboolean val) const
+bool JBoolean::operator!=(JNIType val) const
 {
   return !(*this == val);
 }
@@ -62,5 +62,7 @@ const JClass& JBoolean::getJavaJniClass() const throw (JNIException)
 {
   return JBoolean::staticGetJavaJniClass();
 }
+
+const char* JBoolean::ClassName = "Boolean";
 
 END_NAMESPACE_3(jace, proxy, types)

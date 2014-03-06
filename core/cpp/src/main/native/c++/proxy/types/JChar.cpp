@@ -17,7 +17,7 @@ JChar::JChar(jvalue value)
   setJavaJniValue(value);
 }
 
-JChar::JChar(jchar _char)
+JChar::JChar(JNIType _char)
 {
   jvalue value;
   value.c = _char;
@@ -27,14 +27,14 @@ JChar::JChar(jchar _char)
 JChar::~JChar()
 {}
 
-JChar::operator jchar() const
+JChar::operator JNIType() const
 {
   return static_cast<jvalue>(*this).c;
 }
 
 bool JChar::operator==(const JChar& _char) const
 {
-  return static_cast<jchar>(_char) == static_cast<jchar>(*this);
+  return static_cast<JNIType>(_char) == static_cast<JNIType>(*this);
 }
 
 bool JChar::operator!=(const JChar& _char) const
@@ -42,12 +42,12 @@ bool JChar::operator!=(const JChar& _char) const
   return !(*this == _char);
 }
 
-bool JChar::operator==(jchar val) const
+bool JChar::operator==(JNIType val) const
 {
-  return val == static_cast<jchar>(*this);
+  return val == static_cast<JNIType>(*this);
 }
 
-bool JChar::operator!=(jchar val) const
+bool JChar::operator!=(JNIType val) const
 {
   return !(*this == val);
 }
@@ -72,5 +72,6 @@ ostream& operator<<(ostream& stream, const JChar& val)
   return stream << static_cast<char>(val);
 }
 
+const char* JChar::ClassName = "Char";
 
 END_NAMESPACE_3(jace, proxy, types)

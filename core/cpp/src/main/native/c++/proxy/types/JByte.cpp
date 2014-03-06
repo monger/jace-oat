@@ -13,7 +13,7 @@ JByte::JByte(jvalue value)
   setJavaJniValue(value);
 }
 
-JByte::JByte(jbyte byte)
+JByte::JByte(JNIType byte)
 {
   jvalue value;
   value.b = byte;
@@ -23,14 +23,14 @@ JByte::JByte(jbyte byte)
 JByte::~JByte()
 {}
 
-JByte::operator jbyte() const
+JByte::operator JNIType() const
 { 
   return static_cast<jvalue>(*this).b;
 }
 
 bool JByte::operator==(const JByte& _byte) const
 {
-  return static_cast<jbyte>(_byte) == static_cast<jbyte>(*this);
+  return static_cast<JNIType>(_byte) == static_cast<JNIType>(*this);
 }
 
 bool JByte::operator!=(const JByte& _byte) const
@@ -38,12 +38,12 @@ bool JByte::operator!=(const JByte& _byte) const
   return !(*this == _byte);
 }
 
-bool JByte::operator==(jbyte val) const
+bool JByte::operator==(JNIType val) const
 {
-  return val == static_cast<jbyte>(*this);
+  return val == static_cast<JNIType>(*this);
 }
 
-bool JByte::operator!=(jbyte val) const
+bool JByte::operator!=(JNIType val) const
 {
   return !(*this == val);
 }
@@ -63,5 +63,6 @@ const JClass& JByte::getJavaJniClass() const throw (JNIException)
   return JByte::staticGetJavaJniClass();
 }
 
+const char* JByte::ClassName = "Byte";
 
 END_NAMESPACE_3(jace, proxy, types)

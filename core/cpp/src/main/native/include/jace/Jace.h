@@ -508,6 +508,40 @@ template <typename T> void java_throw(const std::string& message) {
 }
 
 /**
+ * Boxes a value as an object.  T should be one of the jace value types (JInt, JBoolean, etc)
+ */
+template <typename T> jobject java_box(T val) {
+    std::string className = std::string("java/lang/") + T::ClassName;
+    JNIEnv* env = attach();
+    jclass boxClass = env->FindClass(className.c_str());
+    if (!boxClass) {
+        THROW_JNI_EXCEPTION("Could not find class " + className);
+    }
+    
+    std::string sig = std::string("(") + T::staticGetJavaJniClass().getSignature() + ")L" + className + ";";
+    jmethodID valueOf = env->GetStaticMethodID(boxClass, "valueOf", sig.c_str());
+    if (!valueOf) {
+        env->DeleteLocalRef(boxClass);
+        THROW_JNI_EXCEPTION("Could not get valueOf function");
+    }
+    
+    jobject ret = env->CallStaticObjectMethod(boxClass, valueOf, static_cast<typename T::JNIType>(val));
+    try {
+        jace::catchAndThrow();
+    } catch (std::exception& e) {
+    	env->DeleteLocalRef(boxClass);
+		std::string msg = "Exception thrown invoking valueOf()\n";
+		msg.append("caused by:\n");
+		msg.append(e.what());
+		throw JNIException(msg);
+    }
+	env->DeleteLocalRef(boxClass);
+    return ret;
+}
+
+
+
+/**
  * Equal to Java's instanceof keyword.
  * Returns true if obj is non-null and can be cast to type T.
  *

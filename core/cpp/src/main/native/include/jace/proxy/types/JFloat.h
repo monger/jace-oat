@@ -19,6 +19,10 @@ BEGIN_NAMESPACE_3(jace, proxy, types)
 class JFloat : public JValue
 {
 public:
+    /** Typedefs for this object */
+    typedef jfloat      JNIType;
+    static const char*  ClassName;
+
 	/**
 	 * Creates a new instance with the given value.
 	 */
@@ -27,7 +31,7 @@ public:
 	/**
 	 * Creates a new instance with the given value.
 	 */
-	JACE_API JFloat(jfloat value);
+	JACE_API JFloat(JNIType value);
 
 	/**
 	 * Destroys the existing java object.
@@ -37,7 +41,7 @@ public:
 	/**
 	 * Returns the value of this instance.
 	 */
-	JACE_API operator jfloat() const;
+	JACE_API operator JNIType() const;
 
 	/**
 	 * Compares this instance to another.
@@ -52,12 +56,12 @@ public:
 	/**
 	 * Compares this instance to another.
 	 */
-	JACE_API bool operator==(jfloat value) const;
+	JACE_API bool operator==(JNIType value) const;
 
 	/**
 	 * Compares this instance to another.
 	 */
-	JACE_API bool operator!=(jfloat value) const;
+	JACE_API bool operator!=(JNIType value) const;
 
 	/**
 	 * Returns the JClass for this class.

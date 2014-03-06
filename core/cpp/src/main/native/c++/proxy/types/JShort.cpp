@@ -14,7 +14,7 @@ JShort::JShort(jvalue value)
   setJavaJniValue(value);
 }
 
-JShort::JShort(jshort _short)
+JShort::JShort(JNIType _short)
 {
   jvalue value;
   value.s = _short;
@@ -24,14 +24,14 @@ JShort::JShort(jshort _short)
 JShort::~JShort()
 {}
 
-JShort::operator jshort() const
+JShort::operator JNIType() const
 {
   return static_cast<jvalue>(*this).s;
 }
 
 bool JShort::operator==(const JShort& _short) const
 {
-  return static_cast<jshort>(_short) == static_cast<jshort>(*this);
+  return static_cast<JNIType>(_short) == static_cast<JNIType>(*this);
 }
 
 bool JShort::operator!=(const JShort& _short) const
@@ -39,12 +39,12 @@ bool JShort::operator!=(const JShort& _short) const
   return !(*this == _short);
 }
 
-bool JShort::operator==(jshort val) const
+bool JShort::operator==(JNIType val) const
 {
-  return val == static_cast<jshort>(*this);
+  return val == static_cast<JNIType>(*this);
 }
 
-bool JShort::operator!=(jshort val) const
+bool JShort::operator!=(JNIType val) const
 {
   return !(*this == val);
 }
@@ -63,5 +63,7 @@ const JClass& JShort::getJavaJniClass() const throw (JNIException)
 {
   return JShort::staticGetJavaJniClass();
 }
+
+const char* JShort::ClassName = "Short";
 
 END_NAMESPACE_3(jace, proxy, types)

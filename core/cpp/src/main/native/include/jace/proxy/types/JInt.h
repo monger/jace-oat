@@ -23,6 +23,10 @@ class JByte;
 class JInt: public JValue
 {
 public:
+    /** Typedefs for this object */
+    typedef jint        JNIType;
+    static const char*  ClassName;
+
 	/**
 	 * Creates a new instance with the given value.
 	 */
@@ -31,7 +35,7 @@ public:
 	/**
 	 * Creates a new instance with the given value.
 	 */
-	JACE_API JInt(const jint _int);
+	JACE_API JInt(const JNIType _int);
 
 	/**
 	 * Creates a new instance with the given value.
@@ -46,7 +50,7 @@ public:
 	/**
 	 * Returns the value of this instance.
 	 */
-	JACE_API operator jint() const;
+	JACE_API operator JNIType() const;
 
 	/**
 	 * Compares this JInt to another.
@@ -59,14 +63,14 @@ public:
 	JACE_API bool operator!=(const JInt& _int) const;
 
 	/**
-	 * Compares this JInt to a jint.
+	 * Compares this JInt to a JNIType.
 	 */
-	JACE_API bool operator==(jint val) const;
+	JACE_API bool operator==(JNIType val) const;
 
 	/**
-	 * Compares this JInt to a jint.
+	 * Compares this JInt to a JNIType.
 	 */
-	JACE_API bool operator!=(jint val) const;
+	JACE_API bool operator!=(JNIType val) const;
 
 	/**
 	 * Returns the JClass for this class.

@@ -14,7 +14,7 @@ JFloat::JFloat(jvalue value)
   setJavaJniValue(value);
 }
 
-JFloat::JFloat(jfloat _float)
+JFloat::JFloat(JNIType _float)
 {
   jvalue value;
   value.f = _float;
@@ -24,14 +24,14 @@ JFloat::JFloat(jfloat _float)
 JFloat::~JFloat()
 {}
 
-JFloat::operator jfloat() const
+JFloat::operator JNIType() const
 {
   return static_cast<jvalue>(*this).f;
 }
 
 bool JFloat::operator==(const JFloat& _float) const
 {
-  return static_cast<jfloat>(_float) == static_cast<jfloat>(*this);
+  return static_cast<JNIType>(_float) == static_cast<JNIType>(*this);
 }
 
 bool JFloat::operator!=(const JFloat& _float) const
@@ -39,12 +39,12 @@ bool JFloat::operator!=(const JFloat& _float) const
   return !(*this == _float);
 }
 
-bool JFloat::operator==(jfloat val) const
+bool JFloat::operator==(JNIType val) const
 {
-  return val == static_cast<jfloat>(*this);
+  return val == static_cast<JNIType>(*this);
 }
 
-bool JFloat::operator!=(jfloat val) const
+bool JFloat::operator!=(JNIType val) const
 {
   return !(*this == val);
 }
@@ -64,6 +64,7 @@ const JClass& JFloat::getJavaJniClass() const throw (JNIException)
   return JFloat::staticGetJavaJniClass();
 }
 
+const char* JFloat::ClassName = "Float";
 
 END_NAMESPACE_3(jace, proxy, types)
 

@@ -21,6 +21,10 @@ class JInt;
 class JLong: public JValue
 {
 public:
+    /** Typedefs for this object */
+    typedef jlong       JNIType;
+    static const char*  ClassName;
+
 	/**
 	 * Creates a new instance with the given value.
 	 */
@@ -29,7 +33,7 @@ public:
 	/**
 	 * Creates a new instance with the given value.
 	 */
-	JACE_API JLong(jlong _long);
+	JACE_API JLong(JNIType _long);
 
 	/**
 	 * Creates a new instance with the given value.
@@ -44,7 +48,7 @@ public:
 	/**
 	 * Returns the value of this instance.
 	 */
-	JACE_API operator jlong() const;
+	JACE_API operator JNIType() const;
 
 	/**
 	 * Compares this instance to another.
@@ -60,12 +64,12 @@ public:
 	/**
 	 * Compares this instance to a primitive.
 	 */
-	JACE_API bool operator==(jlong val) const;
+	JACE_API bool operator==(JNIType val) const;
 
 	/**
 	 * Compares this instance to a primitive.
 	 */
-	JACE_API bool operator!=(jlong val) const;
+	JACE_API bool operator!=(JNIType val) const;
 
 	/**
 	 * Returns the JClass for this class.

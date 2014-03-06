@@ -25,6 +25,10 @@ BEGIN_NAMESPACE_3(jace, proxy, types)
 class JBoolean: public ::jace::proxy::JValue
 {
 public:
+    /** Typedefs for this object */
+    typedef jboolean    JNIType;
+    static const char*  ClassName;
+
 	/**
 	 * Creates a new instance with the given value.
 	 */
@@ -33,7 +37,7 @@ public:
 	/**
 	 * Creates a new instance with the given value.
 	 */
-	JACE_API JBoolean(jboolean value);
+	JACE_API JBoolean(JNIType value);
 
 	/**
 	 * Destroys the existing java object.
@@ -43,7 +47,7 @@ public:
 	/**
 	 * Returns the value of this instance.
 	 */
-	JACE_API operator jboolean() const;
+	JACE_API operator JNIType() const;
 
 	/**
 	 * Compares this JBoolean to another.
@@ -56,14 +60,14 @@ public:
 	JACE_API bool operator!=(const JBoolean& _boolean) const;
 
 	/**
-	 * Compares this JBoolean to a jboolean.
+	 * Compares this JBoolean to a JNIType.
 	 */
-	JACE_API bool operator==(jboolean val) const;
+	JACE_API bool operator==(JNIType val) const;
 
 	/**
-	 * Compares this JBoolean to a jboolean.
+	 * Compares this JBoolean to a JNIType.
 	 */
-	JACE_API bool operator!=(jboolean val) const;
+	JACE_API bool operator!=(JNIType val) const;
 
 	/**
 	 * Returns the JClass for this class.

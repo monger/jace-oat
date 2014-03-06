@@ -14,7 +14,7 @@ JDouble::JDouble(jvalue value)
   setJavaJniValue(value);
 }
 
-JDouble::JDouble(jdouble _double)
+JDouble::JDouble(JNIType _double)
 {
   jvalue value;
   value.d = _double;
@@ -24,14 +24,14 @@ JDouble::JDouble(jdouble _double)
 JDouble::~JDouble()
 {}
 
-JDouble::operator jdouble() const
+JDouble::operator JNIType() const
 {
   return static_cast<jvalue>(*this).d;
 }
 
 bool JDouble::operator==(const JDouble& _double) const
 {
-  return static_cast<jdouble>(_double) == static_cast<jdouble>(*this);
+  return static_cast<JNIType>(_double) == static_cast<JNIType>(*this);
 }
 
 bool JDouble::operator!=(const JDouble& _double) const
@@ -39,12 +39,12 @@ bool JDouble::operator!=(const JDouble& _double) const
   return !(*this == _double);
 }
 
-bool JDouble::operator==(jdouble val) const
+bool JDouble::operator==(JNIType val) const
 {
-  return val == static_cast<jdouble>(*this);
+  return val == static_cast<JNIType>(*this);
 }
 
-bool JDouble::operator!=(jdouble val) const
+bool JDouble::operator!=(JNIType val) const
 {
   return !(*this == val);
 }
@@ -64,5 +64,6 @@ const JClass& JDouble::getJavaJniClass() const throw (JNIException)
   return JDouble::staticGetJavaJniClass();
 }
 
+const char* JDouble::ClassName = "Double";
 
 END_NAMESPACE_3(jace, proxy, types)

@@ -19,6 +19,10 @@ BEGIN_NAMESPACE_3(jace, proxy, types)
 class JDouble : public JValue
 {
 public:
+    /** Typedefs for this object */
+    typedef jdouble     JNIType;
+    static const char*  ClassName;
+
 	/**
 	 * Creates a new JDouble with the given value.
 	 */
@@ -27,7 +31,7 @@ public:
 	/**
 	 * Creates a new JDouble with the given value.
 	 */
-	JACE_API JDouble(jdouble value);
+	JACE_API JDouble(JNIType value);
 
 	/**
 	 * Destroys the existing java object.
@@ -37,7 +41,7 @@ public:
 	/**
 	 * Returns the value of this instance.
 	 */
-	JACE_API operator jdouble() const;
+	JACE_API operator JNIType() const;
 
 	/**
 	 * Compares this instance to another.
@@ -52,12 +56,12 @@ public:
 	/**
 	 * Compares this instance to another.
 	 */
-	JACE_API bool operator==(jdouble value) const;
+	JACE_API bool operator==(JNIType value) const;
 
 	/**
 	 * Compares this instance to another.
 	 */
-	JACE_API bool operator!=(jdouble value) const;
+	JACE_API bool operator!=(JNIType value) const;
 
 	/**
 	 * Returns the JClass for this class.
