@@ -147,4 +147,4 @@ void Builder::registerCallback(const std::string& name, const Callback& callback
     return returnVal;
 }
 
-END_NAMESPACE_3(jace, runtime, ShutdownHook)
+END_NAMESPACE_3(jace, runtime, NativeProxy)

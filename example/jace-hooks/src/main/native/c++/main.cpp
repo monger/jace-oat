@@ -13,7 +13,6 @@ using jace::JNIException;
 #include "jace/VirtualMachineShutdownError.h"
 using jace::VirtualMachineShutdownError;
 
-#include "jace/runtime/ShutdownHook.h"
 #include "jace/runtime/NativeProxy.h"
 using namespace jace::runtime;
 using jace::runtime::NativeProxy::CallbackArgs;
@@ -72,8 +71,6 @@ int main(int argc, char* argv[])
         OptionList list;
         list.push_back(jace::ClassPath(argv[1]));
         jace::createVm(loader, list, false);
-        /* Try the shutdown hook registration */
-        ShutdownHook::registerShutdownHook();
     
         /* We need to do this in our own scope, so that the proxy gets cleaned up before we destroy the VM */
         {
