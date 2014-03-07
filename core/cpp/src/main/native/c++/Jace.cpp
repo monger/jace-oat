@@ -12,9 +12,6 @@ using jace::proxy::JObject;
 #include "jace/proxy/JValue.h"
 using jace::proxy::JValue;
 
-#include "jace/Peer.h"
-using jace::Peer;
-
 #include "jace/VmLoader.h"
 using ::jace::VmLoader;
 
@@ -844,25 +841,6 @@ void deleteGlobalRef(JNIEnv* env, jobject globalRef)
 void catchAndThrow()
 {
 	catchAndThrow(attach());
-}
-
-::jace::Peer* getPeer(jobject jPeer)
-{
-	JNIEnv* env = attach();
-
-	jclass peerClass = env->GetObjectClass(jPeer);
-	jmethodID handleID = env->GetMethodID(peerClass, "jaceGetNativeHandle", "()J");
-
-	if (!handleID)
-	{
-        THROW_JNI_EXCEPTION("Unable to locate the method, \"jaceGetNativeHandle\".\n"
-			                "The class has not been properly enhanced.");
-	}
-
-	jlong nativeHandle = env->CallLongMethod(jPeer, handleID);
-	catchAndThrow();
-
-	return reinterpret_cast< ::jace::Peer* >(nativeHandle);
 }
 
 JavaVM* getJavaVm()

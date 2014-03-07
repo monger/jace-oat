@@ -18,16 +18,6 @@
   #include <strstream>
 #endif
 
-
-BEGIN_NAMESPACE(jace)
-class Peer;
-END_NAMESPACE(jace)
-
-BEGIN_NAMESPACE_2(jace, proxy)
-class JValue;
-END_NAMESPACE_2(jace, proxy)
-
-
 #include <jni.h>
 
 /**
@@ -219,11 +209,6 @@ inline std::string unwrapException(const std::string& msg) {
     return msg;
 }
 #define THROW_JNI_EXCEPTION(m) throw JNIException(unwrapException(m))
-
-/**
- * Returns the Peer for a given java Peer.
- */
-JACE_API Peer* getPeer(jobject jPeer);
 
 /**
  * Returns the ClassLoader being used by the current thread.
@@ -538,7 +523,6 @@ template <typename T> jobject java_box(T val) {
 	env->DeleteLocalRef(boxClass);
     return ret;
 }
-
 
 
 /**

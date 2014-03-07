@@ -15,16 +15,6 @@ public class JaceConstants
 	}
 
 	/**
-	 * The package used to prefix all Jace peers.
-	 *
-	 * @return the package used to prefix all Jace peers
-	 */
-	public static TypeName getPeerPackage()
-	{
-		return TypeNameFactory.fromPath("jace/peer");
-	}
-
-	/**
 	 * The package used to prefix all Jace proxies.
 	 *
 	 * @return the package used to prefix all Jace proxies
