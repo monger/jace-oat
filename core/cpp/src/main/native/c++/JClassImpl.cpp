@@ -2,38 +2,22 @@
 
 #include "jace/Jace.h"
 
-#include "jace/BoostWarningOff.h"
-#include <boost/thread/mutex.hpp>
-#include "jace/BoostWarningOn.h"
-
 using std::string;
 
 BEGIN_NAMESPACE(jace)
 
-
 JClassImpl::JClassImpl(const string& _internalName, const string& _signature):
-  internalName(_internalName), 
-  signature(_signature),
-	theClass(0)
-{
-	mutex = new boost::mutex();
-}
+    internalName(_internalName), signature(_signature), theClass(0) {}
 
 
 JClassImpl::JClassImpl(const string& _internalName): 
-  internalName(_internalName),
-  signature("L" + internalName + ";"),
-	theClass(0)
-{
-	mutex = new boost::mutex();
-}
+    internalName(_internalName), signature("L" + internalName + ";"), theClass(0) {}
 	
 /**
  * Destroys this JClassImpl.
  */
 JClassImpl::~JClassImpl() throw ()
 {
-	delete mutex;
 	if (theClass)
 	{
 		if (!isRunning())
@@ -60,7 +44,7 @@ const string& JClassImpl::getSignature() const
  */
 jclass JClassImpl::getClass() const throw (JNIException)
 {
-	boost::mutex::scoped_lock lock(*mutex);
+	boost::mutex::scoped_lock lock(mutex);
 	if (theClass == 0)
 	{
 		JNIEnv* env = attach();

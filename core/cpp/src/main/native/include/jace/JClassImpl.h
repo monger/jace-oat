@@ -6,9 +6,9 @@
 #include "jace/JClass.h"
 #include "jace/JNIException.h"
 
-BEGIN_NAMESPACE(boost)
-	class mutex;
-END_NAMESPACE(boost)
+#include "jace/BoostWarningOff.h"
+#include <boost/thread/mutex.hpp>
+#include "jace/BoostWarningOn.h"
 
 #include <string>
 
@@ -91,7 +91,7 @@ private:
 	std::string internalName;
 	std::string signature;
 	mutable jclass theClass;
-	boost::mutex* mutex;
+	mutable boost::mutex mutex;
 };
 
 
