@@ -1,7 +1,6 @@
 #ifndef JACE_RUNTIME_NATIVEPROXY_H
 #define JACE_RUNTIME_NATIVEPROXY_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 #include "jace/JNIException.h"
 

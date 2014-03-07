@@ -51,7 +51,6 @@ public class AutoProxy
 	private final File outputSources;
 	private final ClassPath classPath;
 	private final AccessibilityType accessibility;
-	private final boolean exportSymbols;
 	/**
 	 * The set of classes to process.
 	 */
@@ -74,7 +73,6 @@ public class AutoProxy
 		this.outputSources = builder.outputSources;
 		this.classPath = builder.classPath;
 		this.accessibility = builder.accessibility;
-		this.exportSymbols = builder.exportSymbols;
 		this.proxies = new ClassSet(builder.classPath, builder.minimizeDependencies);
 		if (builder.minimizeDependencies)
 			proxies.addClasses(builder.extraDependencies);
@@ -190,7 +188,7 @@ public class AutoProxy
 					getAbsolutePath());
 			}
 			new ProxyGenerator.Builder(classPath, classFile, dependencies).accessibility(accessibility).
-				exportSymbols(exportSymbols).build().writeProxy(outputHeaders, outputSources);
+				build().writeProxy(outputHeaders, outputSources);
 			input.close();
 		}
 	}
@@ -340,7 +338,7 @@ public class AutoProxy
 					 + "Where options can be:"
 					 + newLine + "  -mindep " + newLine
 					 + "  -extraDependencies=<comma-separated list of classes>" + newLine
-					 + "  -exportsymbols" + newLine + "  -public    : Generate public fields and methods."
+					 + "  -public    : Generate public fields and methods."
 					 + newLine
 					 + "  -protected : Generate public, protected fields and methods." + newLine
 					 + "  -package : Generate public, protected, package-private fields and methods."
@@ -385,7 +383,6 @@ public class AutoProxy
 
 		boolean minimizeDependencies = false;
 		Set<TypeName> extraDependencies = Sets.newHashSetWithExpectedSize(args.length - 5);
-		boolean exportSymbols = false;
 		AccessibilityType accessibility = AccessibilityType.PUBLIC;
 		for (int i = 5; i < args.length; ++i)
 		{
@@ -400,8 +397,6 @@ public class AutoProxy
 				for (String token: commaTokens)
 					extraDependencies.add(TypeNameFactory.fromIdentifier(token));
 			}
-			else if (option.equals("-exportsymbols"))
-				exportSymbols = true;
 			else if (option.equals("-public"))
 				accessibility = AccessibilityType.PUBLIC;
 			else if (option.equals("-protected"))
@@ -421,8 +416,7 @@ public class AutoProxy
 
 		AutoProxy.Builder autoProxy = new AutoProxy.Builder(inputHeaders, inputSources, outputHeaders,
 			outputSources,
-			new ClassPath(classPath)).accessibility(accessibility).minimizeDependencies(
-			minimizeDependencies).exportSymbols(exportSymbols);
+			new ClassPath(classPath)).accessibility(accessibility).minimizeDependencies(minimizeDependencies);
 		for (TypeName dependency: extraDependencies)
 			autoProxy.extraDependency(dependency);
 		Logger log = LoggerFactory.getLogger(AutoProxy.class);
@@ -456,7 +450,6 @@ public class AutoProxy
 		private AccessibilityType accessibility = AccessibilityType.PUBLIC;
 		private boolean minimizeDependencies = true;
 		private final Set<TypeName> extraDependencies = Sets.newHashSet();
-		private boolean exportSymbols;
 
 		/**
 		 * Creates a new AutoProxy.
@@ -557,19 +550,6 @@ public class AutoProxy
 		public Builder extraDependency(TypeName dependency)
 		{
 			extraDependencies.add(dependency);
-			return this;
-		}
-
-		/**
-		 * Indicates if proxy symbols should be exported (i.e. for use in DLLs)
-		 *
-		 * @param value
-		 *        <code>true</code> if proxy symbols should be exported. The default is false.
-		 * @return the Builder
-		 */
-		public Builder exportSymbols(boolean value)
-		{
-			this.exportSymbols = value;
 			return this;
 		}
 

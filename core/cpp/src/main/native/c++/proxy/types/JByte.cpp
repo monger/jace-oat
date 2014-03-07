@@ -2,9 +2,7 @@
 
 #include "jace/JClassImpl.h"
 
-#include "jace/BoostWarningOff.h"
 #include <boost/thread/mutex.hpp>
-#include "jace/BoostWarningOn.h"
 
 BEGIN_NAMESPACE_3(jace, proxy, types)
 

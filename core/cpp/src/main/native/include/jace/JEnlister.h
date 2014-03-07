@@ -1,14 +1,11 @@
 #ifndef JACE_JENLISTER_H
 #define JACE_JENLISTER_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 #include "jace/Jace.h"
 #include "jace/JFactory.h"
 
-#include "jace/BoostWarningOff.h"
 #include <boost/shared_ptr.hpp>
-#include "jace/BoostWarningOn.h"
 
 
 BEGIN_NAMESPACE(jace)

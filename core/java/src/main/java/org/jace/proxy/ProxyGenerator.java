@@ -73,7 +73,6 @@ public class ProxyGenerator
 	private final ClassPath classPath;
 	private final AccessibilityType accessibility;
 	private final MetaClassFilter dependencyFilter;
-	private final boolean exportSymbols;
 	private final Logger log = LoggerFactory.getLogger(ProxyGenerator.class);
 	/**
 	 * The names of macros that may conflict with generated code.
@@ -94,7 +93,6 @@ public class ProxyGenerator
 		this.classFile = builder.classFile;
 		this.accessibility = builder.accessibility;
 		this.dependencyFilter = builder.dependencyFilter;
-		this.exportSymbols = builder.exportSymbols;
 		this.classPath = builder.classPath;
 	}
 
@@ -164,9 +162,7 @@ public class ProxyGenerator
 		if (className.equals("java.lang.String"))
 			output.write("#include \"jace/proxy/java/lang/Integer.h\"" + newLine);
 
-		output.write("#include \"jace/BoostWarningOff.h\"" + newLine);
 		output.write("#include <boost/thread/mutex.hpp>" + newLine);
-		output.write("#include \"jace/BoostWarningOn.h\"" + newLine);
 	}
 
 	/**
@@ -214,20 +210,6 @@ public class ProxyGenerator
 
 		endNamespace(output);
 		output.write(newLine);
-
-		// Define (if necessary) the ElementProxy specializations
-		output.write("BEGIN_NAMESPACE(jace)" + newLine);
-		output.write(newLine);
-		output.write("#ifndef PUT_TSDS_IN_HEADER" + newLine);
-		printElementProxyTsd(output, metaClass);
-		output.write("#endif" + newLine);
-
-		// Define (if necessary) the ElementProxy specializations
-		output.write("#ifndef PUT_TSDS_IN_HEADER" + newLine);
-		printFieldProxyTsd(output, metaClass);
-		output.write("#endif" + newLine);
-		output.write(newLine);
-		output.write("END_NAMESPACE(jace)" + newLine);
 	}
 
 	/**
@@ -925,30 +907,11 @@ public class ProxyGenerator
 
 		output.write("BEGIN_NAMESPACE(jace)" + newLine);
 		output.write(newLine);
-		output.write("#ifndef PUT_TSDS_IN_HEADER" + newLine);
-		output.write("  template <> ElementProxy< " + fullName
-								 + " >::ElementProxy(jarray array, jvalue element, int index);" + newLine);
-		output.write("  template <> ElementProxy< " + fullName
-								 + " >::ElementProxy(const jace::ElementProxy< " + fullName
-								 + " >& proxy);" + newLine);
-		output.write("#else" + newLine);
 		printElementProxyTsd(output, metaClass);
-		output.write("#endif" + newLine);
 		output.write(newLine);
 
 		// declare (and if necessary define) the FieldProxy specialization
-		output.write("#ifndef PUT_TSDS_IN_HEADER" + newLine);
-		output.write("  template <> JFieldProxy< " + fullName
-								 + " >::JFieldProxy(jfieldID _fieldID, jvalue value, jobject _parent);" + newLine);
-		output.write("  template <> JFieldProxy< " + fullName
-								 + " >::JFieldProxy(jfieldID _fieldID, jvalue value, jclass _parentClass);"
-								 + newLine);
-		output.write("  template <> JFieldProxy< " + fullName
-								 + " >::JFieldProxy(const ::jace::JFieldProxy< " + fullName
-								 + " >& object);" + newLine);
-		output.write("#else" + newLine);
 		printFieldProxyTsd(output, metaClass);
-		output.write("#endif" + newLine);
 		output.write(newLine);
 		output.write("END_NAMESPACE(jace)" + newLine);
 	}
@@ -1314,9 +1277,6 @@ public class ProxyGenerator
 
 		Util.generateComment(output, isConstructor ? "Creates a new " + className + "." : methodName);
 
-		if (exportSymbols)
-			output.write("JACE_PROXY_API ");
-
 		// if this is a constructor, there is no return-type
 		if (isConstructor)
 			output.write("static " + className + " create");
@@ -1412,30 +1372,18 @@ public class ProxyGenerator
 																 + "All subclasses of JObject should provide this constructor"
 																 + newLine
 																 + "for their own subclasses.");
-		if (exportSymbols)
-			output.write("JACE_PROXY_API ");
 		output.write("explicit " + metaClass.getSimpleName() + "();" + newLine);
 
 		Util.generateComment(output, "Copy an existing reference.");
-		if (exportSymbols)
-			output.write("JACE_PROXY_API ");
 		output.write(metaClass.getSimpleName() + "(const " + metaClass.getSimpleName() + "&);" + newLine);
 
 		output.write(nonConstructors.toString());
 
-		if (exportSymbols)
-			output.write("JACE_PROXY_API ");
 		output.write("virtual const JClass& getJavaJniClass() const throw (::jace::JNIException);"
 								 + newLine);
-		if (exportSymbols)
-			output.write("JACE_PROXY_API ");
 		output.write("static const JClass& staticGetJavaJniClass() throw (::jace::JNIException);"
 								 + newLine);
-		if (exportSymbols)
-			output.write("JACE_PROXY_API ");
 		output.write("explicit " + metaClass.getSimpleName() + "(jvalue);" + newLine);
-		if (exportSymbols)
-			output.write("JACE_PROXY_API ");
 		output.write("explicit " + metaClass.getSimpleName() + "(jobject);" + newLine);
 
 		// now declare the special "one-off" methods that we add to classes like, Object, String, and Throwable to provide
@@ -1444,94 +1392,64 @@ public class ProxyGenerator
 		{
 			Util.generateComment(output,
 				"Provide the standard \"System.out.println()\" semantics for ostreams.");
-			if (exportSymbols)
-				output.write("JACE_PROXY_API ");
 			output.write("friend std::ostream& operator<<(std::ostream& out, Object& object);" + newLine);
 		}
 		else if (fullyQualifiedName.equals("java.lang.String"))
 		{
 			Util.generateComment(output, "Creates a String from a C string.");
-			if (exportSymbols)
-				output.write("JACE_PROXY_API ");
 			output.write("String(const char*);" + newLine);
 
 			Util.generateComment(output,
 				"Creates a new jstring from a std::string using the platform's default charset.");
-			if (exportSymbols)
-				output.write("JACE_PROXY_API ");
 			output.write("String(const std::string&);" + newLine);
 
 			Util.generateComment(output, "Creates a String from a std::wstring.");
-			if (exportSymbols)
-				output.write("JACE_PROXY_API ");
 			output.write("String(const std::wstring&);" + newLine);
 
 			Util.generateComment(output, "Handle assignment between two Strings.");
-			if (exportSymbols)
-				output.write("JACE_PROXY_API ");
 			output.write("String& operator=(const String& str);" + newLine);
 			output.write(newLine);
 
 			Util.generateComment(output, "Converts a String to a std::string.");
-			if (exportSymbols)
-				output.write("JACE_PROXY_API ");
 			output.write("operator std::string() const;" + newLine);
 			output.write(newLine);
 
 			Util.generateComment(output, "Converts a String to a std::wstring.");
-			if (exportSymbols)
-				output.write("JACE_PROXY_API ");
 			output.write("operator std::wstring() const;" + newLine);
 			output.write(newLine);
 
 			Util.generateComment(output, "Allows Strings to be written to ostreams.");
-			if (exportSymbols)
-				output.write("JACE_PROXY_API ");
 			output.write("friend std::ostream& operator<<(std::ostream& stream, const String& str);"
 									 + newLine);
 			output.write(newLine);
 
 			Util.generateComment(output, "Provide concatentation for Strings.");
-			if (exportSymbols)
-				output.write("JACE_PROXY_API ");
 			output.write("String operator+(String);" + newLine);
 			output.write(newLine);
 
 			Util.generateComment(output, "Provide concatenation between Strings and std::strings.");
-			if (exportSymbols)
-				output.write("JACE_PROXY_API ");
 			output.write("friend std::string operator+(const std::string&, const String&);" + newLine);
 			output.write(newLine);
 
 			Util.generateComment(output, "Provide concatenation between Strings and std::strings.");
-			if (exportSymbols)
-				output.write("JACE_PROXY_API ");
 			output.write("friend std::string operator+(const String&, const std::string&);" + newLine);
 			output.write(newLine);
 
 			Util.generateComment(output, "Provide comparison between Strings and std::strings.");
-			if (exportSymbols)
-				output.write("JACE_PROXY_API ");
 			output.write("friend bool operator==(const std::string&, const String&);" + newLine);
 			output.write(newLine);
 
 			Util.generateComment(output, "Provide comparison between Strings and std::strings.");
-			if (exportSymbols)
-				output.write("JACE_PROXY_API ");
 			output.write("friend bool operator==(const String&, const std::string&);" + newLine);
 			output.write(newLine);
 		}
 		else if (fullyQualifiedName.equals("java.lang.Throwable"))
 		{
 			Util.generateComment(output, "Need to support a non-throwing destructor");
-			if (exportSymbols)
-				output.write("JACE_PROXY_API ");
 			output.write("~Throwable() throw ();" + newLine);
 			output.write(newLine);
 
 			Util.generateComment(output, "Overrides std::exception::what() by returning this.toString();");
-			if (exportSymbols)
-				output.write("JACE_PROXY_API ");
 			output.write("const char* what() const throw();" + newLine);
 			output.write(newLine);
 		}
@@ -1597,8 +1515,6 @@ public class ProxyGenerator
 			// if (accessFlagSet.contains(FieldAccessFlag.FINAL))
 			// modifiers = modifiers + "const ";
 
-			if (exportSymbols)
-				output.write("JACE_PROXY_API ");
 			output.write(modifiers + type + " " + name + "();" + newLine);
 			output.write(newLine);
 		}
@@ -1734,7 +1650,6 @@ public class ProxyGenerator
 	{
 		// We don't need to include any of the primitive types (JInt, JByte, etc...)
 		// because they are all included by both JArray.h and JFieldProxy.h
-		output.write("#include \"jace/OsDep.h\"" + newLine);
 		output.write("#include \"jace/Namespace.h\"" + newLine);
 
 		output.write("#include \"" + JaceConstants.getProxyPackage().asPath() + "/JObject.h\""
@@ -2019,7 +1934,6 @@ public class ProxyGenerator
 		private final MetaClassFilter dependencyFilter;
 		private final ClassPath classPath;
 		private AccessibilityType accessibility = AccessibilityType.PUBLIC;
-		private boolean exportSymbols;
 
 		/**
 		 * Creates a new Builder.
@@ -2043,18 +1957,6 @@ public class ProxyGenerator
 			this.classFile = classFile;
 			this.dependencyFilter = dependencyFilter;
 			this.classPath = classPath;
-		}
-
-		/**
-		 * Indicates if proxy symbols should be exported (i.e. for use in DLLs)
-		 *
-		 * @param value true if proxy symbols should be exported. The default is false.
-		 * @return the Builder
-		 */
-		public Builder exportSymbols(boolean value)
-		{
-			this.exportSymbols = value;
-			return this;
 		}
 
 		/**

@@ -1,7 +1,6 @@
 #ifndef JACE_TYPES_JCHAR_H
 #define JACE_TYPES_JCHAR_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 #include "jace/Jace.h"
 #include "jace/JClass.h"
@@ -28,57 +27,57 @@ public:
 	/**
 	 * Creates a new JChar with the given value.
 	 */
-	JACE_API JChar(jvalue value);
+	JChar(jvalue value);
 
 	/**
 	 * Creates a new JChar with the given value.
 	 */
-	JACE_API JChar(JNIType _char);
+	JChar(JNIType _char);
 
 	/**
 	 * Destroys the existing java object.
 	 */
-	JACE_API virtual ~JChar();
+	virtual ~JChar();
 
 	/**
 	 * Returns the char value of this java char.
 	 */
-	JACE_API operator JNIType() const;
+	operator JNIType() const;
 
 	/**
 	 * Compares this instance to another.
 	 */
-	JACE_API bool operator==(const JChar& _char) const;
+	bool operator==(const JChar& _char) const;
 
 	/**
 	 * Compares this instance to another.
 	 */
-	JACE_API bool operator!=(const JChar& _char) const;
+	bool operator!=(const JChar& _char) const;
 
 	/**
 	 * Compares this instance to another.
 	 */
-	JACE_API bool operator==(JNIType val) const;
+	bool operator==(JNIType val) const;
 
 	/**
 	 * Compares this instance to another.
 	 */
-	JACE_API bool operator!=(JNIType val) const;
+	bool operator!=(JNIType val) const;
 
 	/**
 	 * Returns the JClass for this class.
 	 */
-	JACE_API static const ::jace::JClass& staticGetJavaJniClass() throw (::jace::JNIException);
+	static const ::jace::JClass& staticGetJavaJniClass() throw (::jace::JNIException);
 
 	/**
 	 * Returns the JClass for this instance.
 	 */
-	JACE_API virtual const ::jace::JClass& getJavaJniClass() const throw (::jace::JNIException);
+	virtual const ::jace::JClass& getJavaJniClass() const throw (::jace::JNIException);
 
 	/**
 	 * Support printing of characters.
 	 */
-	JACE_API friend std::ostream& operator<<(std::ostream& stream, const JChar& val);
+	friend std::ostream& operator<<(std::ostream& stream, const JChar& val);
 };
 
 END_NAMESPACE_3(jace, proxy, types)

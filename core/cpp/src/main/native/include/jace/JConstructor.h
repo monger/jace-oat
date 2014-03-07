@@ -1,7 +1,6 @@
 #ifndef JACE_JCONSTRUCTOR_H
 #define JACE_JCONSTRUCTOR_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 #include "jace/JClass.h"
 
@@ -20,7 +19,7 @@ public:
 	/**
 	 * Creates a new JConstructor for the given JClass.
 	 */
-	JACE_API JConstructor(const ::jace::JClass& javaClass);
+	JConstructor(const ::jace::JClass& javaClass);
 
 	/**
 	 * Invokes the constructor with the given JArguments.
@@ -28,7 +27,7 @@ public:
 	 * @throws JNIException if an error occurs while trying to invoke the constructor.
 	 * @throws a matching C++ proxy, if a java exception is thrown by the constructor.
 	 */
-	JACE_API jobject invoke(const JArguments& arguments);
+	jobject invoke(const JArguments& arguments);
 
 private:
 	/**

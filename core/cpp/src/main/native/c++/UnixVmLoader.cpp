@@ -1,7 +1,6 @@
+#ifndef _WIN32
 
 #include "jace/UnixVmLoader.h"
-
-#ifdef JACE_GENERIC_UNIX
 
 using ::jace::UnixVmLoader;
 using ::jace::VmLoader;
@@ -65,4 +64,4 @@ UnixVmLoader::~UnixVmLoader()
 
 END_NAMESPACE(jace)
 
-#endif // JACE_GENERIC_UNIX
+#endif // !_WIN32

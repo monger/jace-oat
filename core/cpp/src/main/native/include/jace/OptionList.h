@@ -1,7 +1,6 @@
 #ifndef JACE_OPTION_LIST_H
 #define JACE_OPTION_LIST_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 #include "jace/JNIException.h"
 
@@ -10,9 +9,7 @@
 #include <vector>
 #include <string>
 
-#include "jace/BoostWarningOff.h"
 #include <boost/shared_ptr.hpp>
-#include "jace/BoostWarningOn.h"
 
 BEGIN_NAMESPACE(jace)
 
@@ -26,25 +23,25 @@ BEGIN_NAMESPACE(jace)
 class Option
 {
 public:
-  JACE_API virtual ~Option() {}
+  virtual ~Option() {}
 
   /**
    * Returns the text string value of the option.
    * For example, "-Djava.class.path=c:\foo\myclasses"
    */
-  JACE_API virtual const std::string stringValue() const = 0;
+  virtual const std::string stringValue() const = 0;
 
   /**
    * Returns the extra data required for an option,
    * for example, a pointer to a vfprintf hook.
    * Returns NULL if no extra data is required.
    */
-  JACE_API virtual void* extraInfo() = 0;
+  virtual void* extraInfo() = 0;
 
   /**
    * Returns a dynamically allocated copy of the Option.
    */
-  JACE_API virtual Option* clone() const = 0;
+  virtual Option* clone() const = 0;
 };
 
 /**
@@ -60,27 +57,27 @@ public:
   /**
    * Creates a new empty OptionList.
    */
-  JACE_API OptionList();
+  OptionList();
 
   /**
    * Adds a clone of option to the list.
    */
-  JACE_API void push_back(const Option& option);
+  void push_back(const Option& option);
 
   /**
    * Returns the size of the list.
    */
-  JACE_API size_t size() const;
+  size_t size() const;
 
   /**
    * Returns an iterator to the beginning of the list.
    */
-	JACE_API std::vector<OptionPtr>::const_iterator begin() const;
+	std::vector<OptionPtr>::const_iterator begin() const;
 
   /**
    * Returns an iterator to the beginning of the list.
    */
-  JACE_API std::vector<OptionPtr>::const_iterator end() const;
+  std::vector<OptionPtr>::const_iterator end() const;
 
   /**
    * Returns the OptionList as an array of JNI options.
@@ -88,12 +85,12 @@ public:
    * The caller must deallocate the options by making a call
    * to destroyJniOptions().
    */
-  JACE_API JavaVMOption* createJniOptions() const;
+  JavaVMOption* createJniOptions() const;
 
   /**
    * Releases the options created by a call to createJniOptions().
    */
-  JACE_API void destroyJniOptions(JavaVMOption* jniOptions) const;
+  void destroyJniOptions(JavaVMOption* jniOptions) const;
 
 private:
 	/**
@@ -119,26 +116,26 @@ public:
    * @param value the property name (encoded using the default platform encoding)
    * @see jace::toPlatformEncoding(std::wstring)
    */
-  JACE_API SystemProperty(const std::string& name, const std::string& value);
+  SystemProperty(const std::string& name, const std::string& value);
 
 	/**
 	 * Copy constructor.
 	 */
-	JACE_API SystemProperty(const SystemProperty& other);
+	SystemProperty(const SystemProperty& other);
 
 	/**
    * Returns the name of the SystemProperty.
    */
-  JACE_API virtual const std::string name();
+  virtual const std::string name();
 
   /**
    * Returns the value of the SystemProperty.
    */
-  JACE_API virtual const std::string value();
+  virtual const std::string value();
 
-  JACE_API virtual const std::string stringValue() const;
-  JACE_API virtual void* extraInfo();
-  JACE_API virtual Option* clone() const;
+  virtual const std::string stringValue() const;
+  virtual void* extraInfo();
+  virtual Option* clone() const;
 
 private:
 	/**
@@ -476,7 +473,7 @@ public:
 	/**
 	 * The component that should output verbosely.
 	 */
-	JACE_API enum ComponentType {
+	enum ComponentType {
 		/**
 		 * The garbage collector.
 		 */
@@ -496,16 +493,16 @@ public:
 	 *
 	 * @param component the component type
 	 */
-  JACE_API Verbose(ComponentType component);
+  Verbose(ComponentType component);
 
 	/**
 	 * Copy constructor.
 	 */
-	JACE_API Verbose(const Verbose& other);
+	Verbose(const Verbose& other);
 
-  JACE_API virtual const std::string stringValue() const;
-  JACE_API virtual void* extraInfo();
-  JACE_API virtual Option* clone() const;
+  virtual const std::string stringValue() const;
+  virtual void* extraInfo();
+  virtual Option* clone() const;
 
 private:
 	/**
@@ -535,7 +532,7 @@ public:
 	 * @param path the path to the JavaAgent (encoded using the default platform encoding)
 	 * @see jace::toPlatformEncoding(std::wstring)
 	 */
-  JACE_API JavaAgent(const std::string& path);
+  JavaAgent(const std::string& path);
 
 	/**
 	 * Creates a new JavaAgent.
@@ -544,27 +541,27 @@ public:
 	 * @param options the agent options (encoded using the default platform encoding)
 	 * @see jace::toPlatformEncoding(std::wstring)
 	 */
-	JACE_API JavaAgent(const std::string& path, const std::string& options);
+	JavaAgent(const std::string& path, const std::string& options);
 
 	/**
 	 * Copy constructor.
 	 */
-	JACE_API JavaAgent(const JavaAgent& other);
+	JavaAgent(const JavaAgent& other);
 
 	/**
    * Returns the path of the Java agent.
    *
    */
-  JACE_API virtual const std::string path();
+  virtual const std::string path();
 
 	/**
    * Returns the Java agent options.
    *
    */
-  JACE_API virtual const std::string options();
-  JACE_API virtual const std::string stringValue() const;
-  JACE_API virtual void* extraInfo();
-  JACE_API virtual Option* clone() const;
+  virtual const std::string options();
+  virtual const std::string stringValue() const;
+  virtual void* extraInfo();
+  virtual Option* clone() const;
 
 private:
 	/**
@@ -601,16 +598,16 @@ public:
 	 * @param value the option value (encoded using the default platform encoding)
 	 * @see jace::toPlatformEncoding(std::wstring)
    */
-  JACE_API CustomOption(const std::string& value);
+  CustomOption(const std::string& value);
 
 	/**
 	 * Copy constructor.
 	 */
-	JACE_API CustomOption(const CustomOption& other);
+	CustomOption(const CustomOption& other);
 
-	JACE_API virtual const std::string stringValue() const;
-  JACE_API virtual void* extraInfo();
-  JACE_API virtual Option* clone() const;
+	virtual const std::string stringValue() const;
+  virtual void* extraInfo();
+  virtual Option* clone() const;
 
 private:
 	/**
@@ -638,11 +635,11 @@ class VfprintfHook: public Hook
 public:
   typedef int (*vfprintf_t)(FILE* fp, const char* format, va_list arg);
 
-  JACE_API VfprintfHook(vfprintf_t hook_);
+  VfprintfHook(vfprintf_t hook_);
 
-  JACE_API virtual const std::string stringValue() const;
-  JACE_API virtual void* extraInfo();
-  JACE_API virtual Option* clone() const;
+  virtual const std::string stringValue() const;
+  virtual void* extraInfo();
+  virtual Option* clone() const;
 
 private:
   vfprintf_t hook;
@@ -656,11 +653,11 @@ class ExitHook: public Hook
 public:
   typedef void (*exit_t)(int status);
 
-  JACE_API ExitHook(exit_t _hook);
+  ExitHook(exit_t _hook);
 
-  JACE_API virtual const std::string stringValue() const;
-  JACE_API virtual void* extraInfo();
-  JACE_API virtual Option* clone() const;
+  virtual const std::string stringValue() const;
+  virtual void* extraInfo();
+  virtual Option* clone() const;
 
 private:
   exit_t hook;
@@ -675,11 +672,11 @@ class AbortHook: public Hook
 public:
   typedef void (*abort_t) (void);
 
-  JACE_API AbortHook(abort_t _hook);
+  AbortHook(abort_t _hook);
 
-  JACE_API virtual const std::string stringValue() const;
-  JACE_API virtual void* extraInfo();
-  JACE_API virtual Option* clone() const;
+  virtual const std::string stringValue() const;
+  virtual void* extraInfo();
+  virtual Option* clone() const;
 
 private:
   abort_t hook;

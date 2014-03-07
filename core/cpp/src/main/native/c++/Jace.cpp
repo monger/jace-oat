@@ -1,6 +1,5 @@
 #include "jace/Jace.h"
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 
 #include "jace/JFactory.h"
@@ -43,12 +42,10 @@ using std::map;
 using std::string;
 using std::wstring;
 
-#include "jace/BoostWarningOff.h"
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/tss.hpp>
 #include <boost/shared_ptr.hpp>
-#include "jace/BoostWarningOn.h"
 
 BEGIN_NAMESPACE(jace)
 
@@ -557,9 +554,11 @@ JNIEnv* attachImpl(JavaVM* jvm,
 	args.version = jniVersion;
 	if (name != 0)
 	{
-#ifdef JACE_VM_ARGS_CONST_NAME
+#ifdef __ANDROID__
+#define _JACE_ENV_CAST
         args.name = name;
 #else        
+#define _JACE_ENV_CAST (void**)
         args.name = new char[strlen(name)+1];        
         strcpy(args.name, name);
 #endif
@@ -568,7 +567,7 @@ JNIEnv* attachImpl(JavaVM* jvm,
 	{
 		string temp("NativeThread-");
 		temp += toString(boost::this_thread::get_id());
-#ifdef JACE_VM_ARGS_CONST_NAME
+#ifdef __ANDROID__
         args.name = temp.c_str();
 #else
         args.name = new char[temp.length() + 1];
@@ -579,18 +578,19 @@ JNIEnv* attachImpl(JavaVM* jvm,
 	jint result;
 	if (daemon == NON_DAEMON || 
         (daemon == AUTO && (mainThreadId == boost::thread::id() || mainThreadId == boost::this_thread::get_id()))) {
-		result = jvm->AttachCurrentThread(JACE_ENV_CAST &env, &args);
+		result = jvm->AttachCurrentThread(_JACE_ENV_CAST &env, &args);
 	} else {
-		result = jvm->AttachCurrentThreadAsDaemon(JACE_ENV_CAST &env, &args);
+		result = jvm->AttachCurrentThreadAsDaemon(_JACE_ENV_CAST &env, &args);
     }
     if (mainThreadId != boost::this_thread::get_id()) {
         /* Attach our env to this thread so that we can auto-detach */
         attachedJni.reset(&env);
     }
-#ifndef JACE_VM_ARGS_CONST_NAME
+#ifndef __ANDROID__
     delete[] args.name;
 #endif
-
+#undef _JACE_ENV_CAST
+    
 	if (result != 0)
 	{
 		string msg = string("Jace::attach\n") +

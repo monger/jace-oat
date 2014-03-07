@@ -1,7 +1,6 @@
 #ifndef JACE_JARGUMENTS_H
 #define JACE_JARGUMENTS_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 #include "jace/proxy/JValue.h"
 
@@ -20,7 +19,7 @@ public:
 	/**
 	 * Constructs a new argument list.
 	 */
-	JACE_API JArguments();
+	JArguments();
 
 	/**
 	 * Adds a new JValue to the argument list.
@@ -28,7 +27,7 @@ public:
 	 * The order that the arguments are added is significant. They must
 	 * be in the same order as the parameter types for the method.
 	 */
-	JACE_API JArguments& add(const ::jace::proxy::JValue& value);
+	JArguments& add(const ::jace::proxy::JValue& value);
 
 
 	/**
@@ -50,12 +49,12 @@ public:
 	 *
 	 *   method.invoke(JArguments() << arg1 << arg2 << arg3);
 	 */
-	JACE_API JArguments& operator<<(const ::jace::proxy::JValue& value);
+	JArguments& operator<<(const ::jace::proxy::JValue& value);
 
 	/**
 	 * Returns this JArguments as a list of JValue*'s.
 	 */
-	JACE_API std::list<const ::jace::proxy::JValue*> asList() const;
+	std::list<const ::jace::proxy::JValue*> asList() const;
 
 private:
 	std::list<const ::jace::proxy::JValue*> mList;

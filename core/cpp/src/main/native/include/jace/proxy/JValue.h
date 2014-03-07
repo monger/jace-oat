@@ -1,7 +1,6 @@
 #ifndef JACE_JVALUE_H
 #define JACE_JVALUE_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 #include "jace/JClass.h"
 #include "jace/JNIException.h"
@@ -57,17 +56,17 @@ public:
 	/**
 	 * Constructs a new JValue.
 	 */
-	JACE_API JValue();
+	JValue();
 
 	/**
 	 * Destroys the existing JValue.
 	 */
-	JACE_API virtual ~JValue();
+	virtual ~JValue();
 
 	/**
 	 * Returns the underlying JNI jvalue for this JValue.
 	 */
-	JACE_API operator jvalue();
+	operator jvalue();
 
 	/**
 	 * Returns the underlying JNI jvalue for this JValue.
@@ -75,14 +74,14 @@ public:
 	 * Callers of this method should be careful not to call modifying
 	 * methods on the returned jvalue.
 	 */
-	JACE_API operator jvalue() const;
+	operator jvalue() const;
 
 	/**
 	 * Retrieves the JClass for this JValue.
 	 *
 	 * @throw JNIException if an error occurs while trying to retrieve the class.
 	 */
-	JACE_API virtual const ::jace::JClass& getJavaJniClass() const throw (::jace::JNIException) = 0;
+	virtual const ::jace::JClass& getJavaJniClass() const throw (::jace::JNIException) = 0;
 
 protected:
 	/**
@@ -97,7 +96,7 @@ protected:
 	 *   or if the JVM runs out of memory while trying to create
 	 *   a new global reference.
 	 */
-	JACE_API virtual void setJavaJniValue(jvalue value) throw (::jace::JNIException);
+	virtual void setJavaJniValue(jvalue value) throw (::jace::JNIException);
 
 private:
 	/**

@@ -1,7 +1,6 @@
 #ifndef JACE_TYPES_JBYTE_H
 #define JACE_TYPES_JBYTE_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 #include "jace/Jace.h"
 #include "jace/JClass.h"
@@ -26,53 +25,53 @@ public:
 	/**
 	 * Creates a new JByte with the given value.
 	 */
-	JACE_API JByte(jvalue value);
+	JByte(jvalue value);
 
 	/**
 	 * Creates a new JByte with the given value.
 	 */
-	JACE_API JByte(JNIType byte);
+	JByte(JNIType byte);
 
 	/**
 	 * Destroys the existing java object.
 	 */
-	JACE_API virtual ~JByte();
+	virtual ~JByte();
 
 	/**
 	 * Returns the byte value of this java byte.
 	 */
-	JACE_API operator JNIType() const;
+	operator JNIType() const;
 
 	/**
 	 * Compares this JByte to another.
 	 */
-	JACE_API bool operator==(const JByte& _byte) const;
+	bool operator==(const JByte& _byte) const;
 
 	/**
 	 * Compares this JByte to another.
 	 */
-	JACE_API bool operator!=(const JByte& _byte) const;
+	bool operator!=(const JByte& _byte) const;
 
 
 	/**
 	 * Compares this JByte to a JNIType.
 	 */
-	JACE_API bool operator==(JNIType val) const;
+	bool operator==(JNIType val) const;
 
 	/**
 	 * Compares this JByte to a JNIType.
 	 */
-	JACE_API bool operator!=(JNIType val) const;
+	bool operator!=(JNIType val) const;
 
 	/**
 	 * Returns the JClass for this class.
 	 */
-	JACE_API static const ::jace::JClass& staticGetJavaJniClass() throw (::jace::JNIException);
+	static const ::jace::JClass& staticGetJavaJniClass() throw (::jace::JNIException);
 
 	/**
 	 * Returns the JClass for this instance.
 	 */
-	JACE_API virtual const ::jace::JClass& getJavaJniClass() const throw (::jace::JNIException);
+	virtual const ::jace::JClass& getJavaJniClass() const throw (::jace::JNIException);
 };
 
 

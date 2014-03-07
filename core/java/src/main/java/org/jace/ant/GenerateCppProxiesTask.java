@@ -25,7 +25,7 @@ import org.jace.proxy.ProxyGenerator.AccessibilityType;
  *
  * {@code
  *   <GenerateCppProxies inputHeaders="input/include" inputSources="input/source"
- *     outputHeaders="output/include" outputSources="output/source" exportSymbols="false"
+ *     outputHeaders="output/include" outputSources="output/source"
  *     minimizeDependencies="true" classpath="rt.jar" accessibility="PUBLIC">
  *     <classpath>
  *       <pathelement location="classes"/>
@@ -62,10 +62,6 @@ public class GenerateCppProxiesTask extends Task
 	 * classes even if they are not referenced at the time the generator is run.
 	 */
 	private Set<Dependency> dependencies = Sets.newHashSet();
-	/**
-	 * True if proxies should export their symbols (for DLLs/SOs).
-	 */
-	private boolean exportSymbols;
 	/**
 	 * Indicates whether classes should be exported even if they are not referenced by the input
 	 * files.
@@ -139,16 +135,6 @@ public class GenerateCppProxiesTask extends Task
 	}
 
 	/**
-	 * Indicates if the proxy symbols should be exported (for generating DLLs/SOs).
-	 *
-	 * @param exportSymbols true if the proxy symbols should be exported
-	 */
-	public void setExportSymbols(boolean exportSymbols)
-	{
-		this.exportSymbols = exportSymbols;
-	}
-
-	/**
 	 * Indicates whether classes should be exported even if they are not referenced by the input
 	 * files.
 	 *
@@ -193,7 +179,7 @@ public class GenerateCppProxiesTask extends Task
 			extraDependencies.add(TypeNameFactory.fromIdentifier(dependency.getName()));
 		AutoProxy.Builder autoProxy = new AutoProxy.Builder(inputHeaders, inputSources, outputHeaders,
 			outputSources, new ClassPath(classpath.toString())).accessibility(accessibility).
-			minimizeDependencies(minimizeDependencies).exportSymbols(exportSymbols);
+			minimizeDependencies(minimizeDependencies);
 		for (TypeName dependency: extraDependencies)
 			autoProxy.extraDependency(dependency);
 		try
@@ -265,7 +251,7 @@ public class GenerateCppProxiesTask extends Task
 	{
 		return getClass().getSimpleName() + "[inputHeaders=" + inputHeaders + ", inputSources="
 					 + inputSources + ", outputHeader=" + outputHeaders + ", outputSources=" + outputSources
-					 + ", exportSymbols=" + exportSymbols + ", minimizeDependencies=" + minimizeDependencies
+					 + ", minimizeDependencies=" + minimizeDependencies
 					 + "]";
 	}
 }

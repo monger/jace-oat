@@ -1,9 +1,7 @@
 #ifndef JACE_UNIX_VM_LOADER
 #define JACE_UNIX_VM_LOADER
 
-#include "jace/OsDep.h"
-
-#ifdef JACE_GENERIC_UNIX
+#ifndef _WIN32
 
 #include "jace/Namespace.h"
 #include "jace/VmLoader.h"
@@ -35,11 +33,11 @@ public:
    *
 	 * @throws JNIException if an error occurs while loading the JVM library
    */
-  JACE_API UnixVmLoader(std::string path, jint jniVersion = DEFAULT_JNI_VERSION) throw (JNIException);
-  JACE_API virtual ~UnixVmLoader();
+  UnixVmLoader(std::string path, jint jniVersion = DEFAULT_JNI_VERSION) throw (JNIException);
+  virtual ~UnixVmLoader();
 
-  JACE_API jint createJavaVM(JavaVM **pvm, void **env, void *args) const;
-  JACE_API jint getCreatedJavaVMs(JavaVM **vmBuf, jsize bufLen, jsize *nVMs) const;
+  jint createJavaVM(JavaVM **pvm, void **env, void *args) const;
+  jint getCreatedJavaVMs(JavaVM **vmBuf, jsize bufLen, jsize *nVMs) const;
 
 private:
   typedef jint (JNICALL *CreateJavaVM_t)(JavaVM **pvm, void **env, void *args);
@@ -54,7 +52,7 @@ private:
 
 END_NAMESPACE(jace)
 
-#endif // JACE_GENERIC_UNIX
+#endif // !_WIN32
 
 #endif // JACE_UNIX_VM_LOADER
 

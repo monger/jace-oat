@@ -1,7 +1,4 @@
-
 #ifdef _WIN32
-
-#include "jace/OsDep.h"
 
 #include "jace/Win32VmLoader.h"
 using ::jace::VmLoader;
@@ -87,7 +84,7 @@ void Win32VmLoader::specifyVm(Win32VmLoader::JVMVendor jvmVendor, Win32VmLoader:
 					throw JNIException("No default Sun JRE found");
 			}
 
-#ifdef JACE_AMD64
+#ifdef _M_X64
 			if (jvmType == JVMT_DEFAULT)
 			{
 				// WORKAROUND: 64-bit JVM only ships with <jre>/bin/server/jvm.dll yet the registry points to
@@ -227,4 +224,3 @@ Win32VmLoader::~Win32VmLoader()
 }
 
 #endif // _WIN32
-

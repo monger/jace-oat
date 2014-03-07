@@ -1,14 +1,11 @@
 #ifndef JACE_JFACTORY_H
 #define JACE_JFACTORY_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 
 #include <jni.h>
 
-#include "jace/BoostWarningOff.h"
 #include <boost/shared_ptr.hpp>
-#include "jace/BoostWarningOn.h"
 
 BEGIN_NAMESPACE_2(jace, proxy)
 class JValue;
@@ -35,7 +32,7 @@ public:
 	 * Creates a new instance of the value type
 	 * for this JFactory.
 	 */
-	JACE_API virtual boost::shared_ptr< ::jace::proxy::JValue > create(jvalue val) = 0;
+	virtual boost::shared_ptr< ::jace::proxy::JValue > create(jvalue val) = 0;
 
 
 	/**
@@ -49,18 +46,18 @@ public:
 	 * except that the return value's real type is preserved and
 	 * not sliced to a JValue upon being thrown.
 	 */
-	JACE_API virtual void throwInstance(jvalue val) = 0;
+	virtual void throwInstance(jvalue val) = 0;
 
 	/**
 	 * Returns the class of which this factory
 	 * creates instances.
 	 */
-	JACE_API virtual const ::jace::JClass& getClass() = 0;
+	virtual const ::jace::JClass& getClass() = 0;
 
 	/**
 	 * Destroys this JFactory.
 	 */
-	JACE_API virtual ~JFactory();
+	virtual ~JFactory();
 };
 
 END_NAMESPACE(jace)
