@@ -48,15 +48,6 @@ typedef boost::unique_lock<boost::shared_mutex>             auto_write_lock;
 typedef boost::upgrade_lock<boost::shared_mutex>            auto_upgrade_lock;
 typedef boost::upgrade_to_unique_lock<boost::shared_mutex>  auto_upgrade_unique_lock;
 
-enum Daemon {
-	/** Attach as non-daemon */
-	NON_DAEMON,
-	/** Attach as daemon */
-	DAEMON,
-	/** Attach as daemon if this is not the main thread */
-	AUTO
-};
-
 /* The map of all of the java class factories. */
 typedef map<string,JFactory*> FactoryMap;
 FactoryMap* getFactoryMap() {
@@ -93,7 +84,7 @@ boost::thread_specific_ptr<JNIEnv*> attachedJni(threadDetacher);
  * @see AttachCurrentThread
  * @see AttachCurrentThreadAsDaemon
  */
-JNIEnv* attachImpl(JavaVM* jvm, jint jniVersion, const Daemon daemon) /* throw (JNIException) */ {
+JNIEnv* attachImpl(JavaVM* jvm, jint jniVersion, const bool mainThread) /* throw (JNIException) */ {
 	JNIEnv* env;
 	if (jvm->GetEnv((void**) &env, jniVersion) == JNI_OK)
 	{
@@ -116,8 +107,7 @@ JNIEnv* attachImpl(JavaVM* jvm, jint jniVersion, const Daemon daemon) /* throw (
 
 	args.group = 0;
 	jint result;
-	if (daemon == NON_DAEMON || 
-        (daemon == AUTO && (mainThreadId == boost::thread::id() || mainThreadId == boost::this_thread::get_id()))) {
+	if (mainThread || mainThreadId == boost::thread::id() || mainThreadId == boost::this_thread::get_id()) {
 		result = jvm->AttachCurrentThread(_JACE_ENV_CAST &env, &args);
 	} else {
 		result = jvm->AttachCurrentThreadAsDaemon(_JACE_ENV_CAST &env, &args);
@@ -149,7 +139,7 @@ JNIEnv* attachImpl(JavaVM* jvm, jint jniVersion, const Daemon daemon) /* throw (
  */
 void setJavaVmImpl(JavaVM* _jvm, jint _jniVersion, auto_upgrade_lock& upgradeLock) {
 	assert(_jvm != 0);
-	JNIEnv* env = attachImpl(_jvm, _jniVersion, NON_DAEMON);
+	JNIEnv* env = attachImpl(_jvm, _jniVersion, true);
     
     {
         auto_upgrade_unique_lock writeLock(upgradeLock);
@@ -249,7 +239,7 @@ JNIEnv* attach() {
 	if (jvm == 0 || jniVersion == 0 || mainThreadId == boost::thread::id()) {
 		throw VirtualMachineShutdownError("The virtual machine is shut down");
     }
-	return attachImpl(jvm, jniVersion, AUTO);
+	return attachImpl(jvm, jniVersion, false);
 }
 
 /** Implementation of detach() */
