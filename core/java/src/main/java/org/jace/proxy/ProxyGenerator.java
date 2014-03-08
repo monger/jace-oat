@@ -348,7 +348,7 @@ public class ProxyGenerator
 				output.write("  jobject localRef = newObject(" + className
 										 + "::staticGetJavaJniClass(), arguments);" + newLine);
 				output.write("  " + className + " result = " + className + "(localRef);" + newLine);
-				output.write("  deleteLocalRef(localRef);" + newLine);
+				output.write("  deleteLocalRef(localRef), localRef = 0;" + newLine);
 				output.write("  return result;" + newLine);
 			}
 			else
@@ -439,7 +439,7 @@ public class ProxyGenerator
 			output.write("{" + newLine);
 			output.write("  jstring strRef = createString(str);" + newLine);
 			output.write("  setJavaJniObject(strRef);" + newLine);
-			output.write("  deleteLocalRef(strRef);" + newLine);
+			output.write("  deleteLocalRef(strRef), strRef = 0;" + newLine);
 			output.write("}" + newLine);
 			output.write(newLine);
 
@@ -447,7 +447,7 @@ public class ProxyGenerator
 			output.write("{" + newLine);
 			output.write("  jstring strRef = createString(str);" + newLine);
 			output.write("  setJavaJniObject(strRef);" + newLine);
-			output.write("  deleteLocalRef(strRef);" + newLine);
+			output.write("  deleteLocalRef(strRef), strRef = 0;" + newLine);
 			output.write("}" + newLine);
 			output.write(newLine);
 
@@ -489,7 +489,7 @@ public class ProxyGenerator
 			output.write(newLine);
 			output.write("  std::string str((char*) byteArray, (char*) byteArray + arraySize);" + newLine);
 			output.write("  env->ReleaseByteArrayElements(array, byteArray, JNI_ABORT);" + newLine);
-			output.write("  env->DeleteLocalRef(array);" + newLine);
+			output.write("  env->DeleteLocalRef(array), array = 0;" + newLine);
 			output.write("  return str;" + newLine);
 			output.write("}" + newLine);
 			output.write(newLine);
@@ -531,7 +531,7 @@ public class ProxyGenerator
 									 + newLine);
 			output.write("  }" + newLine);
 			output.write(newLine);
-			output.write("  env->DeleteLocalRef(jbuf);" + newLine);
+			output.write("  env->DeleteLocalRef(jbuf), jbuf = 0;" + newLine);
 			output.write("  return jstr;" + newLine);
 			output.write("}" + newLine);
 			output.write(newLine);

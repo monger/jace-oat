@@ -271,7 +271,7 @@ jobject newLocalRef(jobject ref) {
 void deleteLocalRef(jobject localRef) {
     try {
         JNIEnv* env = attach();
-    	env->DeleteLocalRef(localRef);
+    	env->DeleteLocalRef(localRef), localRef = 0;
     } catch (...) {}
 }
 
@@ -291,7 +291,7 @@ jobject newGlobalRef(jobject ref) {
 void deleteGlobalRef(jobject globalRef) {
     try {
         JNIEnv* env = attach();
-	    env->DeleteGlobalRef(globalRef);
+	    env->DeleteGlobalRef(globalRef), globalRef = 0;
     } catch (...) {}
 }
 
@@ -336,7 +336,7 @@ void catchAndThrow() {
 		throw JNIException(msg);
 	}
 
-	env->DeleteLocalRef(throwableClass);
+	env->DeleteLocalRef(throwableClass), throwableClass = 0;
 	jmethodID classGetName = env->GetMethodID(classClass, "getName", "()Ljava/lang/String;");
 	if (!classGetName) {
 		string msg = "Assert failed: Unable to find the method, Class.getName().";
@@ -349,7 +349,7 @@ void catchAndThrow() {
 		throw JNIException(msg);
 	}
 
-	env->DeleteLocalRef(classClass);
+	env->DeleteLocalRef(classClass), classClass = 0;
 	jobject exceptionClass = env->CallObjectMethod(jexception, throwableGetClass);
 	if (env->ExceptionOccurred()) {
 		env->ExceptionDescribe();
@@ -390,8 +390,8 @@ void catchAndThrow() {
 				break;
             }
 
-			env->DeleteLocalRef(exceptionClass);
-			env->DeleteLocalRef(exceptionType);
+			env->DeleteLocalRef(exceptionClass), exceptionClass = 0;
+			env->DeleteLocalRef(exceptionType), exceptionType = 0;
 			exceptionClass = superClass;
 
 			exceptionType = static_cast<jstring>(env->CallObjectMethod(exceptionClass, classGetName));
@@ -459,8 +459,8 @@ string toString(jobject obj) {
 
 	env->ReleaseStringUTFChars(javaStr, strBuf);
 
-	env->DeleteLocalRef(javaStr);
-	env->DeleteLocalRef(objectClass);
+	env->DeleteLocalRef(javaStr), javaStr = 0;
+	env->DeleteLocalRef(objectClass), objectClass = 0;
 
 	return value;
 }
@@ -473,7 +473,7 @@ void java_throw(const std::string& internalName, const std::string& message) {
         THROW_JNI_EXCEPTION("Could not find class " + internalName);
     }
     env->ThrowNew(exClass, message.c_str());
-    env->DeleteLocalRef(exClass);
+    env->DeleteLocalRef(exClass), exClass = 0;
 }
 
 

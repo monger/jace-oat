@@ -47,7 +47,7 @@ public:
 	{
 		jvalue value = helper.getField(object);
 		JFieldProxy<Type> fieldProxy(helper.getFieldID(), value, object);
-		deleteLocalRef(value.l);
+		deleteLocalRef(value.l), value.l = 0;
 		return fieldProxy;
 	}
 
@@ -61,7 +61,7 @@ public:
 	{
 		jvalue value = helper.getField(jClass);
 		JFieldProxy<Type> fieldProxy(helper.getFieldID(), value, jClass.getClass());
-		deleteLocalRef(value.l);
+		deleteLocalRef(value.l), value.l = 0;
 		return fieldProxy;
 	}
 

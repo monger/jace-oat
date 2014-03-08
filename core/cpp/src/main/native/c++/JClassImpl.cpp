@@ -45,7 +45,7 @@ jclass JClassImpl::getClass() const {
 		}
 
 		theClass = static_cast<jclass>(env->NewGlobalRef(localClass));
-		env->DeleteLocalRef(localClass);
+		env->DeleteLocalRef(localClass), localClass = 0;
 	}
 	return theClass;
 }

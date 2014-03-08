@@ -79,7 +79,7 @@ public:
 
 
 	~ElementProxy() throw () {
-        deleteGlobalRef(parent);
+        deleteGlobalRef(parent), parent = 0;
 	}
 
 private:

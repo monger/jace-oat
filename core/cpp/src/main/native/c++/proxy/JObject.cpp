@@ -63,7 +63,7 @@ JObject::~JObject() throw ()
 	{
 		jobject ref = *this;
 		if (ref) {
-			deleteGlobalRef(ref);
+			deleteGlobalRef(ref), ref = 0;
 		}
 	}
 	catch (VirtualMachineShutdownError&)
@@ -159,7 +159,7 @@ void JObject::setJavaJniValue(jvalue newValue) {
 
 	// Delete the old value
   if (oldValue) {
-      env->DeleteGlobalRef(oldValue);
+      env->DeleteGlobalRef(oldValue), oldValue = 0;
   }
   JValue::setJavaJniValue(ourCopy);
 }

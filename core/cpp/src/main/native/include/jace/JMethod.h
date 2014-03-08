@@ -79,7 +79,7 @@ public:
 		catchAndThrow();
 
 		ResultType result(resultRef);
-		env->DeleteLocalRef(resultRef);
+		env->DeleteLocalRef(resultRef), resultRef = 0;
 
 		return result;
 	}
@@ -110,7 +110,7 @@ public:
 		catchAndThrow();
 
 		ResultType result(resultRef);
-		env->DeleteLocalRef(resultRef);
+		env->DeleteLocalRef(resultRef), resultRef = 0;
 
 		return result;
 	}

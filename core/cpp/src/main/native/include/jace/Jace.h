@@ -368,7 +368,7 @@ T java_cast(const ::jace::proxy::JObject& obj) {
 	const ::jace::JClass& resultClass = T::staticGetJavaJniClass();
 
 	bool isValid = env->IsAssignableFrom(argClass, resultClass.getClass());
-	env->DeleteLocalRef(argClass);
+	env->DeleteLocalRef(argClass), argClass = 0;
 
 	if (isValid)
 		return T(static_cast<jobject>(obj));
@@ -399,17 +399,17 @@ jobject java_box(T val) {
     std::string sig = std::string("(") + T::staticGetJavaJniClass().getSignature() + ")L" + className + ";";
     jmethodID valueOf = env->GetStaticMethodID(boxClass, "valueOf", sig.c_str());
     if (!valueOf) {
-        env->DeleteLocalRef(boxClass);
+        env->DeleteLocalRef(boxClass), boxClass = 0;
         THROW_JNI_EXCEPTION("Could not get valueOf function");
     }
     
     jobject ret = env->CallStaticObjectMethod(boxClass, valueOf, static_cast<typename T::JNIType>(val));
     std::string msg = "Exception thrown invoking valueOf()\n";
     if (messageException(msg)) {
-    	env->DeleteLocalRef(boxClass);
+    	env->DeleteLocalRef(boxClass), boxClass = 0;
 		throw JNIException(msg);
     }
-	env->DeleteLocalRef(boxClass);
+	env->DeleteLocalRef(boxClass), boxClass = 0;
     return ret;
 }
 
@@ -445,7 +445,7 @@ bool instanceof(const ::jace::proxy::JObject& object) {
 	const ::jace::JClass& resultClass = T::staticGetJavaJniClass();
 
 	bool isValid = env->IsAssignableFrom(argClass, resultClass.getClass());
-	env->DeleteLocalRef(argClass);
+	env->DeleteLocalRef(argClass), argClass = 0;
 
 	return isValid;
 }

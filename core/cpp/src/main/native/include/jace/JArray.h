@@ -83,7 +83,7 @@ public:
 	{
 		jobject localRef = ::jace::JArrayHelper::newArray(size, ElementType::staticGetJavaJniClass());
 		this->setJavaJniObject(localRef);
-		deleteLocalRef(localRef);
+		deleteLocalRef(localRef), localRef = 0;
 		_length = size;
 	}
 
@@ -113,7 +113,7 @@ public:
 			catchAndThrow();
 		}
 		_length = values.size();
-		env->DeleteLocalRef(localArray);
+		env->DeleteLocalRef(localArray), localArray = 0;
 	}
 
 	JArray(const JArray& array): JObject(0)
@@ -168,7 +168,7 @@ public:
 
 		jvalue localElementRef = ::jace::JArrayHelper::getElement(static_cast<jobject>(*this), index);
 		ElementProxy<ElementType> element(this->getJavaJniArray(), localElementRef, index);
-		deleteLocalRef(localElementRef.l);
+		deleteLocalRef(localElementRef.l), localElementRef.l = 0;
 		return element;
 	}
 
@@ -190,7 +190,7 @@ public:
 
 		jvalue localElementRef = ::jace::JArrayHelper::getElement(static_cast<jobject>(*this), index);
 		ElementProxy<ElementType> element(this->getJavaJniArray(), localElementRef, index);
-		deleteLocalRef(localElementRef.l);
+		deleteLocalRef(localElementRef.l), localElementRef.l = 0;
 		return element;
 	}
 
@@ -531,7 +531,7 @@ JArray< ::jace::proxy::types::JBoolean >::JArray(int size)
   }
 
   setJavaJniObject(array);
-  env->DeleteLocalRef(array);
+  env->DeleteLocalRef(array), array = 0;
 
   this->_length = -1;
 }
@@ -597,7 +597,7 @@ JArray< ::jace::proxy::types::JByte >::JArray(int size)
   }
 
   setJavaJniObject(array);
-  env->DeleteLocalRef(array);
+  env->DeleteLocalRef(array), array = 0;
 
   this->_length = -1;
 }
@@ -662,7 +662,7 @@ JArray< ::jace::proxy::types::JChar >::JArray(int size)
   }
 
   setJavaJniObject(array);
-  env->DeleteLocalRef(array);
+  env->DeleteLocalRef(array), array = 0;
 
   this->_length = -1;
 }
@@ -728,7 +728,7 @@ JArray< ::jace::proxy::types::JDouble >::JArray(int size)
   }
 
   setJavaJniObject(array);
-  env->DeleteLocalRef(array);
+  env->DeleteLocalRef(array), array = 0;
 
   this->_length = -1;
 }
@@ -794,7 +794,7 @@ JArray< ::jace::proxy::types::JFloat >::JArray(int size)
   }
 
   setJavaJniObject(array);
-  env->DeleteLocalRef(array);
+  env->DeleteLocalRef(array), array = 0;
 
   this->_length = -1;
 }
@@ -860,7 +860,7 @@ JArray< ::jace::proxy::types::JInt >::JArray(int size)
   }
 
   setJavaJniObject(array);
-  env->DeleteLocalRef(array);
+  env->DeleteLocalRef(array), array = 0;
 
   this->_length = -1;
 }
@@ -926,7 +926,7 @@ JArray< ::jace::proxy::types::JLong >::JArray(int size)
   }
 
   setJavaJniObject(array);
-  env->DeleteLocalRef(array);
+  env->DeleteLocalRef(array), array = 0;
 
   this->_length = -1;
 }
@@ -992,7 +992,7 @@ JArray< ::jace::proxy::types::JShort >::JArray(int size)
   }
 
   setJavaJniObject(array);
-  env->DeleteLocalRef(array);
+  env->DeleteLocalRef(array), array = 0;
 
   this->_length = -1;
 }

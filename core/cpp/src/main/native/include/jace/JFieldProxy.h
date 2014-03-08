@@ -103,12 +103,12 @@ public:
 	virtual ~JFieldProxy() throw () {
 		if (parent)
 		{
-			deleteGlobalRef(parent);
+			deleteGlobalRef(parent), parent = 0;
 		}
 
 		if (parentClass)
 		{
-			deleteGlobalRef(parentClass);
+			deleteGlobalRef(parentClass), parentClass = 0;
 		}
 	}
 

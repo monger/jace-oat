@@ -53,7 +53,7 @@ public:
 	{
 		T t(val);
 		// We know that val is a jobject, because you can only throw exceptions.
-		deleteLocalRef(val.l);
+		deleteLocalRef(val.l), val.l = 0;
 
 		throw t;
 	}
