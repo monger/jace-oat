@@ -83,8 +83,7 @@ public:
 	{
 		jobject localRef = ::jace::JArrayHelper::newArray(size, ElementType::staticGetJavaJniClass());
 		this->setJavaJniObject(localRef);
-		JNIEnv* env = attach();
-		deleteLocalRef(env, localRef);
+		deleteLocalRef(localRef);
 		_length = size;
 	}
 
@@ -114,7 +113,7 @@ public:
 			catchAndThrow();
 		}
 		_length = values.size();
-		deleteLocalRef(env, localArray);
+		env->DeleteLocalRef(localArray);
 	}
 
 	JArray(const JArray& array): JObject(0)
@@ -169,8 +168,7 @@ public:
 
 		jvalue localElementRef = ::jace::JArrayHelper::getElement(static_cast<jobject>(*this), index);
 		ElementProxy<ElementType> element(this->getJavaJniArray(), localElementRef, index);
-		JNIEnv* env = attach();
-		deleteLocalRef(env, localElementRef.l);
+		deleteLocalRef(localElementRef.l);
 		return element;
 	}
 
@@ -192,8 +190,7 @@ public:
 
 		jvalue localElementRef = ::jace::JArrayHelper::getElement(static_cast<jobject>(*this), index);
 		ElementProxy<ElementType> element(this->getJavaJniArray(), localElementRef, index);
-		JNIEnv* env = attach();
-		deleteLocalRef(env, localElementRef.l);
+		deleteLocalRef(localElementRef.l);
 		return element;
 	}
 
@@ -203,8 +200,7 @@ public:
 	 *
 	 * @throw JNIException if an error occurs while trying to retrieve the class.
 	 */
-	virtual const ::jace::JClass& getJavaJniClass() const throw (::jace::JNIException)
-	{
+	virtual const ::jace::JClass& getJavaJniClass() const {
 		return JArray<ElementType>::staticGetJavaJniClass();
 	}
 
@@ -214,8 +210,7 @@ public:
 	 *
 	 * @throw JNIException if an error occurs while trying to retrieve the class.
 	 */
-	static const ::jace::JClass& staticGetJavaJniClass() throw (JNIException)
-	{
+	static const ::jace::JClass& staticGetJavaJniClass() {
 		static boost::shared_ptr<JClassImpl> result;
 		boost::mutex::scoped_lock lock(javaClassMutex);
 		if (result == 0)
@@ -536,7 +531,7 @@ JArray< ::jace::proxy::types::JBoolean >::JArray(int size)
   }
 
   setJavaJniObject(array);
-  deleteLocalRef(env, array);
+  env->DeleteLocalRef(array);
 
   this->_length = -1;
 }
@@ -602,7 +597,7 @@ JArray< ::jace::proxy::types::JByte >::JArray(int size)
   }
 
   setJavaJniObject(array);
-  deleteLocalRef(env, array);
+  env->DeleteLocalRef(array);
 
   this->_length = -1;
 }
@@ -667,7 +662,7 @@ JArray< ::jace::proxy::types::JChar >::JArray(int size)
   }
 
   setJavaJniObject(array);
-  deleteLocalRef(env, array);
+  env->DeleteLocalRef(array);
 
   this->_length = -1;
 }
@@ -733,7 +728,7 @@ JArray< ::jace::proxy::types::JDouble >::JArray(int size)
   }
 
   setJavaJniObject(array);
-  deleteLocalRef(env, array);
+  env->DeleteLocalRef(array);
 
   this->_length = -1;
 }
@@ -799,7 +794,7 @@ JArray< ::jace::proxy::types::JFloat >::JArray(int size)
   }
 
   setJavaJniObject(array);
-  deleteLocalRef(env, array);
+  env->DeleteLocalRef(array);
 
   this->_length = -1;
 }
@@ -865,7 +860,7 @@ JArray< ::jace::proxy::types::JInt >::JArray(int size)
   }
 
   setJavaJniObject(array);
-  deleteLocalRef(env, array);
+  env->DeleteLocalRef(array);
 
   this->_length = -1;
 }
@@ -931,7 +926,7 @@ JArray< ::jace::proxy::types::JLong >::JArray(int size)
   }
 
   setJavaJniObject(array);
-  deleteLocalRef(env, array);
+  env->DeleteLocalRef(array);
 
   this->_length = -1;
 }
@@ -997,7 +992,7 @@ JArray< ::jace::proxy::types::JShort >::JArray(int size)
   }
 
   setJavaJniObject(array);
-  deleteLocalRef(env, array);
+  env->DeleteLocalRef(array);
 
   this->_length = -1;
 }

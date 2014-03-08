@@ -33,7 +33,7 @@ public:
    *
 	 * @throws JNIException if an error occurs while loading the JVM library
    */
-  UnixVmLoader(std::string path, jint jniVersion = DEFAULT_JNI_VERSION) throw (JNIException);
+  UnixVmLoader(std::string path, jint jniVersion = DEFAULT_JNI_VERSION);
   virtual ~UnixVmLoader();
 
   jint createJavaVM(JavaVM **pvm, void **env, void *args) const;

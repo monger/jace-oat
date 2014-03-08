@@ -2,10 +2,7 @@
 using jace::java_new;
 
 #include "jace/DefaultVmLoader.h"
-using jace::DefaultVmLoader;
-
 #include "jace/OptionList.h"
-using jace::OptionList;
 
 #include "jace/JNIException.h"
 using jace::JNIException;
@@ -67,10 +64,10 @@ int main(int argc, char* argv[])
         return 1;
     }
     try {
-        DefaultVmLoader loader(JNI_VERSION_1_6);
-        OptionList list;
+        jace::Loader loader(new jace::DefaultVmLoader(JNI_VERSION_1_6));
+        jace::OptionList list;
         list.push_back(jace::ClassPath(argv[1]));
-        jace::createVm(loader, list, false);
+        jace::createJavaVm(loader, list);
     
         /* We need to do this in our own scope, so that the proxy gets cleaned up before we destroy the VM */
         {
@@ -88,7 +85,7 @@ int main(int argc, char* argv[])
             cout << "List has next: " << (i.hasNext() ? "yes" : "no") << endl;
         }
             
-        jace::destroyVm();
+        jace::resetJavaVm();
         return 0;
     } catch (VirtualMachineShutdownError&) {
         cout << "The JVM was terminated in mid-execution. " << endl;

@@ -15,13 +15,13 @@ BEGIN_NAMESPACE(jace)
 #ifdef _WIN32
     class DefaultVmLoader: public ::jace::Win32VmLoader {
     	public:
-            DefaultVmLoader(jint jniVersion = DEFAULT_JNI_VERSION) throw (JNIException) : 
+            DefaultVmLoader(jint jniVersion = DEFAULT_JNI_VERSION) /* throw (JNIException) */ : 
             Win32VmLoader(JVMV_SUN, JVMT_DEFAULT, "", jniVersion) {}
     };
 #else
     class DefaultVmLoader: public ::jace::UnixVmLoader {
         public:
-        	DefaultVmLoader(jint jniVersion = DEFAULT_JNI_VERSION) throw (JNIException) : 
+        	DefaultVmLoader(jint jniVersion = DEFAULT_JNI_VERSION) /* throw (JNIException) */ : 
         #if defined __ANDROID__
             UnixVmLoader("libdvm.so", jniVersion) {}
         #elif defined __APPLE__

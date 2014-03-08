@@ -52,10 +52,8 @@ public:
 	virtual void throwInstance(jvalue val)
 	{
 		T t(val);
-		JNIEnv* env = attach();
-
 		// We know that val is a jobject, because you can only throw exceptions.
-		deleteLocalRef(env, val.l);
+		deleteLocalRef(val.l);
 
 		throw t;
 	}

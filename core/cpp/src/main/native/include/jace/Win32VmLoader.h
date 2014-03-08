@@ -72,9 +72,9 @@ public:
 	 * @throws JNIException if an error occurs while loading the JVM library.
 	 */
 	Win32VmLoader(JVMVendor jvmVendor = JVMV_SUN,
-		JVMType jvmType = JVMT_DEFAULT,
-		std::string version = "",
-		jint jniVersion = DEFAULT_JNI_VERSION) throw (JNIException);
+		          JVMType jvmType = JVMT_DEFAULT,
+		          std::string version = "",
+		          jint jniVersion = DEFAULT_JNI_VERSION);
 
 	/**
 	 * Creates a new VM loader for the specified VM.
@@ -89,7 +89,7 @@ public:
 	 *
 	 * @throws JNIException if an error occurs while loading the JVM library.
 	 */
-	Win32VmLoader(std::string path, jint jniVersion = DEFAULT_JNI_VERSION) throw (JNIException);
+	Win32VmLoader(std::string path, jint jniVersion = DEFAULT_JNI_VERSION);
 
 	virtual ~Win32VmLoader();
 
@@ -128,7 +128,7 @@ private:
 	 *
 	 * @throws JNIException if an error occurs while trying to load the VM.
 	 */
-	void loadVm(const std::string& path) throw (JNIException);
+	void loadVm(const std::string& path);
 };
 
 END_NAMESPACE(jace)

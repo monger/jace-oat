@@ -47,8 +47,7 @@ public:
 	{
 		jvalue value = helper.getField(object);
 		JFieldProxy<Type> fieldProxy(helper.getFieldID(), value, object);
-		JNIEnv* env = attach();
-		deleteLocalRef(env, value.l);
+		deleteLocalRef(value.l);
 		return fieldProxy;
 	}
 
@@ -62,8 +61,7 @@ public:
 	{
 		jvalue value = helper.getField(jClass);
 		JFieldProxy<Type> fieldProxy(helper.getFieldID(), value, jClass.getClass());
-		JNIEnv* env = attach();
-		deleteLocalRef(env, value.l);
+		deleteLocalRef(value.l);
 		return fieldProxy;
 	}
 

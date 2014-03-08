@@ -120,14 +120,14 @@ public:
 	/**
 	 * Returns the JClass for this class.
 	 */
-	static const ::jace::JClass& staticGetJavaJniClass() throw (::jace::JNIException);
+	static const ::jace::JClass& staticGetJavaJniClass();
 
 	/**
 	 * Returns the JClass that represents the static type of this class.
 	 * For example, for a String Java object, referred to by a C++ proxy object,
 	 * this method returns JClassImpl("java/lang/String").
 	 */
-	virtual const JClass& getJavaJniClass() const throw (JNIException);
+	virtual const JClass& getJavaJniClass() const;
 
 protected:
 	/**
@@ -141,7 +141,7 @@ protected:
 	 *   or if the JVM runs out of memory while trying to create
 	 *   a new global reference.
 	 */
-	virtual void setJavaJniValue(jvalue value) throw (JNIException);
+	virtual void setJavaJniValue(jvalue value);
 
 	/**
 	 * Sets the jobject for this JObject.
@@ -149,7 +149,7 @@ protected:
 	 * This method is simply a convenience method for calling
 	 * setValue(jvalue) with a jobject.
 	 */
-	void setJavaJniObject(jobject object) throw (JNIException);
+	void setJavaJniObject(jobject object);
 
 	/**
 	 * Constructs a new instance of the given class

@@ -74,14 +74,14 @@ public:
 	/**
 	 * Returns the JClass for this class.
 	 */
-	static const ::jace::JClass& staticGetJavaJniClass() throw (::jace::JNIException);
+	static const ::jace::JClass& staticGetJavaJniClass();
 
 	/**
 	 * Retrieves the JavaClass for this JObject.
 	 *
 	 * @throw JNIException if an error occurs while trying to retrieve the class.
 	 */
-	virtual const ::jace::JClass& getJavaJniClass() const throw (::jace::JNIException);
+	virtual const ::jace::JClass& getJavaJniClass() const;
 
 	friend std::ostream& operator<<(std::ostream& stream, const JInt& val);
 };

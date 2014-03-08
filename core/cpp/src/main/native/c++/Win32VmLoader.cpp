@@ -51,10 +51,10 @@ namespace
 }
 
 
-Win32VmLoader::Win32VmLoader(Win32VmLoader::JVMVendor jvmVendor, Win32VmLoader::JVMType jvmType,
-														 std::string jvmVersion, jint _jniVersion) throw (JNIException):
-  VmLoader(_jniVersion), path(), handle(0)
-{
+Win32VmLoader::Win32VmLoader(Win32VmLoader::JVMVendor jvmVendor, 
+                             Win32VmLoader::JVMType jvmType,
+                             std::string jvmVersion, 
+                             jint _jniVersion) : VmLoader(_jniVersion), path(), handle(0) {
   getCreatedJavaVMsPtr = 0;
   createJavaVMPtr = 0;
 
@@ -62,9 +62,7 @@ Win32VmLoader::Win32VmLoader(Win32VmLoader::JVMVendor jvmVendor, Win32VmLoader::
 	loadVm(path);
 }
 
-Win32VmLoader::Win32VmLoader(std::string _path, jint _jniVersion) throw (JNIException):
-	VmLoader(_jniVersion), path(_path), handle(0)
-{
+Win32VmLoader::Win32VmLoader(std::string _path, jint _jniVersion) : VmLoader(_jniVersion), path(_path), handle(0) {
   getCreatedJavaVMsPtr = 0;
   createJavaVMPtr = 0;
 	loadVm(path);
@@ -188,8 +186,7 @@ void Win32VmLoader::specifyVm(Win32VmLoader::JVMVendor jvmVendor, Win32VmLoader:
 	}
 }
 
-void Win32VmLoader::loadVm(const std::string &jvmPath) throw (JNIException)
-{
+void Win32VmLoader::loadVm(const std::string &jvmPath) {
   // Load the Java VM DLL
   if ((handle = LoadLibrary(jvmPath.c_str())) == 0)
     throw JNIException(string("Can't load JVM from ") + jvmPath);

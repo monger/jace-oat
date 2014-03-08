@@ -24,8 +24,8 @@ BEGIN_NAMESPACE_2(jace, proxy)
  *
  * - All JValues must implement the methods:
  *
- *   static const JClass& staticGetJavaJniClass() throw (JNIException) and
- *   const JClass& getJavaJniClass() const throw (JNIException)
+ *   static const JClass& staticGetJavaJniClass() and
+ *   const JClass& getJavaJniClass() const
  *
  *   staticGetJavaJniClass() must return the same value as getJavaJniClass().
  *   For example, Object implements staticGetJavaJniClass() and getJavaJniClass()
@@ -33,8 +33,7 @@ BEGIN_NAMESPACE_2(jace, proxy)
  *
  *
  *   static boost::mutex javaClassMutex;
- *   const JClass& Object::staticGetJavaJniClass() throw (JNIException)
- *   {
+ *   const JClass& Object::staticGetJavaJniClass() {
  *     static boost::shared_ptr<JClassImpl> result;
  *     boost::mutex::scoped_lock lock(javaClassMutex);
  *     if (result == 0)
@@ -42,8 +41,7 @@ BEGIN_NAMESPACE_2(jace, proxy)
  *     return *result;
  *   }
  *
- *   const JClass& Object::getJavaJniClass() const throw (JNIException)
- *   {
+ *   const JClass& Object::getJavaJniClass() const {
  *     return Object::staticGetJavaJniClass();
  *   }
  *
@@ -81,7 +79,7 @@ public:
 	 *
 	 * @throw JNIException if an error occurs while trying to retrieve the class.
 	 */
-	virtual const ::jace::JClass& getJavaJniClass() const throw (::jace::JNIException) = 0;
+	virtual const ::jace::JClass& getJavaJniClass() const = 0;
 
 protected:
 	/**
@@ -96,7 +94,7 @@ protected:
 	 *   or if the JVM runs out of memory while trying to create
 	 *   a new global reference.
 	 */
-	virtual void setJavaJniValue(jvalue value) throw (::jace::JNIException);
+	virtual void setJavaJniValue(jvalue value);
 
 private:
 	/**

@@ -78,17 +78,8 @@ public:
 	}
 
 
-	~ElementProxy() throw()
-	{
-		try
-		{
-			JNIEnv* env = attach();
-			deleteGlobalRef(env, parent);
-		}
-		catch (VirtualMachineShutdownError&)
-		{
-				// We tried to attach when the JVM has already been destroyed
-		}
+	~ElementProxy() throw () {
+        deleteGlobalRef(parent);
 	}
 
 private:
@@ -105,16 +96,14 @@ template <> inline
 ElementProxy< ::jace::proxy::types::JBoolean >::ElementProxy(jarray array, jvalue element, int _index): 
   ::jace::proxy::types::JBoolean(element), index(_index)
 {
-  JNIEnv* env = attach();
-  parent = static_cast<jarray>(::jace::newGlobalRef(env, array));
+  parent = static_cast<jarray>(::jace::newGlobalRef(array));
 }
 
 template <> inline
 ElementProxy< ::jace::proxy::types::JBoolean >::ElementProxy(const ElementProxy& proxy): 
   ::jace::proxy::types::JBoolean(proxy), index(proxy.index)
 {
-  JNIEnv* env = attach();
-  parent = static_cast<jarray>(::jace::newGlobalRef(env, proxy.parent));
+  parent = static_cast<jarray>(::jace::newGlobalRef(proxy.parent));
 }
 
 template <> inline
@@ -131,16 +120,14 @@ template <> inline
 ElementProxy< ::jace::proxy::types::JByte >::ElementProxy(jarray array, jvalue element, int _index): 
   ::jace::proxy::types::JByte(element), index(_index)
 {
-  JNIEnv* env = attach();
-  parent = static_cast<jarray>(newGlobalRef(env, array));
+  parent = static_cast<jarray>(newGlobalRef(array));
 }
 
 template <> inline
 ElementProxy< ::jace::proxy::types::JByte >::ElementProxy(const ElementProxy& proxy): 
   ::jace::proxy::types::JByte(proxy), index(proxy.index)
 {
-  JNIEnv* env = attach();
-  parent = static_cast<jarray>(::jace::newGlobalRef(env, proxy.parent));
+  parent = static_cast<jarray>(::jace::newGlobalRef(proxy.parent));
 }
 
 template <> inline
@@ -157,16 +144,14 @@ template <> inline
 ElementProxy< ::jace::proxy::types::JChar >::ElementProxy(jarray array, jvalue element, int _index): 
   ::jace::proxy::types::JChar(element), index(_index)
 {
-  JNIEnv* env = attach();
-  parent = static_cast<jarray>(newGlobalRef(env, array));
+  parent = static_cast<jarray>(newGlobalRef(array));
 }
 
 template <> inline
 ElementProxy< ::jace::proxy::types::JChar >::ElementProxy(const ElementProxy& proxy): 
   ::jace::proxy::types::JChar(proxy), index(proxy.index)
 {
-  JNIEnv* env = attach();
-  parent = static_cast<jarray>(::jace::newGlobalRef(env, proxy.parent));
+  parent = static_cast<jarray>(::jace::newGlobalRef(proxy.parent));
 }
 
 template <> inline
@@ -183,16 +168,14 @@ template <> inline
 ElementProxy< ::jace::proxy::types::JDouble >::ElementProxy(jarray array, jvalue element, int _index): 
   ::jace::proxy::types::JDouble(element), index(_index)
 {
-  JNIEnv* env = attach();
-  parent = static_cast<jarray>(newGlobalRef(env, array));
+  parent = static_cast<jarray>(newGlobalRef(array));
 }
 
 template <> inline
 ElementProxy< ::jace::proxy::types::JDouble >::ElementProxy(const ElementProxy& proxy): 
   ::jace::proxy::types::JDouble(proxy), index(proxy.index)
 {
-  JNIEnv* env = attach();
-  parent = static_cast<jarray>(::jace::newGlobalRef(env, proxy.parent));
+  parent = static_cast<jarray>(::jace::newGlobalRef(proxy.parent));
 }
 
 template <> inline
@@ -209,16 +192,14 @@ template <> inline
 ElementProxy< ::jace::proxy::types::JFloat >::ElementProxy(jarray array, jvalue element, int _index): 
   ::jace::proxy::types::JFloat(element), index(_index)
 {
-  JNIEnv* env = attach();
-  parent = static_cast<jarray>(newGlobalRef(env, array));
+  parent = static_cast<jarray>(newGlobalRef(array));
 }
 
 template <> inline
 ElementProxy< ::jace::proxy::types::JFloat >::ElementProxy(const ElementProxy& proxy): 
   ::jace::proxy::types::JFloat(proxy), index(proxy.index)
 {
-  JNIEnv* env = attach();
-  parent = static_cast<jarray>(::jace::newGlobalRef(env, proxy.parent));
+  parent = static_cast<jarray>(::jace::newGlobalRef(proxy.parent));
 }
 
 template <> inline
@@ -235,16 +216,14 @@ template <> inline
 ElementProxy< ::jace::proxy::types::JInt >::ElementProxy(jarray array, jvalue element, int _index): 
   ::jace::proxy::types::JInt(element), index(_index)
 {
-  JNIEnv* env = attach();
-  parent = static_cast<jarray>(newGlobalRef(env, array));
+  parent = static_cast<jarray>(newGlobalRef(array));
 }
 
 template <> inline
 ElementProxy< ::jace::proxy::types::JInt >::ElementProxy(const ElementProxy& proxy): 
   ::jace::proxy::types::JInt(proxy), index(proxy.index)
 {
-  JNIEnv* env = attach();
-  parent = static_cast<jarray>(::jace::newGlobalRef(env, proxy.parent));
+  parent = static_cast<jarray>(::jace::newGlobalRef(proxy.parent));
 }
 
 template <> inline
@@ -261,16 +240,14 @@ template <> inline
 ElementProxy< ::jace::proxy::types::JLong >::ElementProxy(jarray array, jvalue element, int _index): 
   ::jace::proxy::types::JLong(element), index(_index)
 {
-  JNIEnv* env = attach();
-  parent = static_cast<jarray>(newGlobalRef(env, array));
+  parent = static_cast<jarray>(newGlobalRef(array));
 }
 
 template <> inline
 ElementProxy< ::jace::proxy::types::JLong >::ElementProxy(const ElementProxy& proxy): 
   ::jace::proxy::types::JLong(proxy), index(proxy.index)
 {
-  JNIEnv* env = attach();
-  parent = static_cast<jarray>(::jace::newGlobalRef(env, proxy.parent));
+  parent = static_cast<jarray>(::jace::newGlobalRef(proxy.parent));
 }
 
 template <> inline
@@ -287,16 +264,14 @@ template <> inline
 ElementProxy< ::jace::proxy::types::JShort >::ElementProxy(jarray array, jvalue element, int _index): 
   ::jace::proxy::types::JShort(element), index(_index)
 {
-  JNIEnv* env = attach();
-  parent = static_cast<jarray>(newGlobalRef(env, array));
+  parent = static_cast<jarray>(newGlobalRef(array));
 }
 
 template <> inline
 ElementProxy< ::jace::proxy::types::JShort >::ElementProxy(const ElementProxy& proxy): 
   ::jace::proxy::types::JShort(proxy), index(proxy.index)
 {
-  JNIEnv* env = attach();
-  parent = static_cast<jarray>(::jace::newGlobalRef(env, proxy.parent));
+  parent = static_cast<jarray>(::jace::newGlobalRef(proxy.parent));
 }
 
 template <> inline

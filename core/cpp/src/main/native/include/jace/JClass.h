@@ -40,7 +40,7 @@ public:
 	/**
 	 * Returns the JNI representation of this class.
 	 */
-	virtual jclass getClass() const throw (jace::JNIException) = 0;
+	virtual jclass getClass() const = 0;
 };
 
 

@@ -71,12 +71,12 @@ public:
 	/**
 	 * Returns the JClass for this class.
 	 */
-	static const ::jace::JClass& staticGetJavaJniClass() throw (::jace::JNIException);
+	static const ::jace::JClass& staticGetJavaJniClass();
 
 	/**
 	 * Returns the JClass for this instance.
 	 */
-	virtual const ::jace::JClass& getJavaJniClass() const throw (::jace::JNIException);
+	virtual const ::jace::JClass& getJavaJniClass() const;
 
 	friend class ::jace::ElementProxy<JBoolean>;
 	friend class ::jace::JFieldProxy<JBoolean>;

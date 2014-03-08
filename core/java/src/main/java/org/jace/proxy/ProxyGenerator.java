@@ -348,14 +348,11 @@ public class ProxyGenerator
 				output.write("  jobject localRef = newObject(" + className
 										 + "::staticGetJavaJniClass(), arguments);" + newLine);
 				output.write("  " + className + " result = " + className + "(localRef);" + newLine);
-				output.write("  JNIEnv* env = attach();" + newLine);
-				output.write("  deleteLocalRef(env, localRef);" + newLine);
+				output.write("  deleteLocalRef(localRef);" + newLine);
 				output.write("  return result;" + newLine);
 			}
 			else
 			{
-//        if (!accessFlagSet.contains(MethodAccessFlag.STATIC))
-//          output.write("const " + newLine);
 				output.write(newLine);
 				output.write("{" + newLine);
 
@@ -442,8 +439,7 @@ public class ProxyGenerator
 			output.write("{" + newLine);
 			output.write("  jstring strRef = createString(str);" + newLine);
 			output.write("  setJavaJniObject(strRef);" + newLine);
-			output.write("  JNIEnv* env = attach();" + newLine);
-			output.write("  deleteLocalRef(env, strRef);" + newLine);
+			output.write("  deleteLocalRef(strRef);" + newLine);
 			output.write("}" + newLine);
 			output.write(newLine);
 
@@ -451,8 +447,7 @@ public class ProxyGenerator
 			output.write("{" + newLine);
 			output.write("  jstring strRef = createString(str);" + newLine);
 			output.write("  setJavaJniObject(strRef);" + newLine);
-			output.write("  JNIEnv* env = attach();" + newLine);
-			output.write("  deleteLocalRef(env, strRef);" + newLine);
+			output.write("  deleteLocalRef(strRef);" + newLine);
 			output.write("}" + newLine);
 			output.write(newLine);
 
@@ -494,7 +489,7 @@ public class ProxyGenerator
 			output.write(newLine);
 			output.write("  std::string str((char*) byteArray, (char*) byteArray + arraySize);" + newLine);
 			output.write("  env->ReleaseByteArrayElements(array, byteArray, JNI_ABORT);" + newLine);
-			output.write("  deleteLocalRef(env, array);" + newLine);
+			output.write("  env->DeleteLocalRef(array);" + newLine);
 			output.write("  return str;" + newLine);
 			output.write("}" + newLine);
 			output.write(newLine);
@@ -536,7 +531,7 @@ public class ProxyGenerator
 									 + newLine);
 			output.write("  }" + newLine);
 			output.write(newLine);
-			output.write("  deleteLocalRef(env, jbuf);" + newLine);
+			output.write("  env->DeleteLocalRef(jbuf);" + newLine);
 			output.write("  return jstr;" + newLine);
 			output.write("}" + newLine);
 			output.write(newLine);
@@ -690,7 +685,7 @@ public class ProxyGenerator
 
 		output.write("static boost::mutex javaClassMutex;" + newLine);
 		output.write("const JClass& " + className
-								 + "::staticGetJavaJniClass() throw (::jace::JNIException)" + newLine);
+								 + "::staticGetJavaJniClass()" + newLine);
 		output.write("{" + newLine);
 		output.write("  static boost::shared_ptr<JClassImpl> result;" + newLine);
 		output.write("  boost::mutex::scoped_lock lock(javaClassMutex);" + newLine);
@@ -703,7 +698,7 @@ public class ProxyGenerator
 		output.write(newLine);
 
 		output.write("const JClass& " + className
-								 + "::getJavaJniClass() const throw (::jace::JNIException)" + newLine);
+								 + "::getJavaJniClass() const" + newLine);
 		output.write("{" + newLine);
 		output.write("  return " + className + "::staticGetJavaJniClass();" + newLine);
 		output.write("}" + newLine);
@@ -939,8 +934,7 @@ public class ProxyGenerator
 		output.write(newLine);
 
 		output.write("  {" + newLine);
-		output.write("    JNIEnv* env = attach();" + newLine);
-		output.write("    parent = static_cast<jarray>(newGlobalRef(env, array));" + newLine);
+		output.write("    parent = static_cast<jarray>(newGlobalRef(array));" + newLine);
 		output.write("  }" + newLine);
 
 		// copy constructor
@@ -956,8 +950,7 @@ public class ProxyGenerator
 		output.write(newLine);
 
 		output.write("  {" + newLine);
-		output.write("    JNIEnv* env = attach();" + newLine);
-		output.write("    parent = static_cast<jarray>(newGlobalRef(env, proxy.parent));" + newLine);
+		output.write("    parent = static_cast<jarray>(newGlobalRef(proxy.parent));" + newLine);
 		output.write("  }" + newLine);
 	}
 
@@ -984,10 +977,8 @@ public class ProxyGenerator
 		output.write(newLine);
 
 		output.write("  {" + newLine);
-		output.write("    JNIEnv* env = attach();" + newLine);
-		output.write(newLine);
 		output.write("    if (_parent)" + newLine);
-		output.write("      parent = newGlobalRef(env, _parent);" + newLine);
+		output.write("      parent = newGlobalRef(_parent);" + newLine);
 		output.write("    else" + newLine);
 		output.write("      parent = _parent;" + newLine);
 		output.write(newLine);
@@ -1007,10 +998,8 @@ public class ProxyGenerator
 		output.write(newLine);
 
 		output.write("  {" + newLine);
-		output.write("    JNIEnv* env = attach();" + newLine);
-		output.write(newLine);
 		output.write("    parent = 0;" + newLine);
-		output.write("    parentClass = static_cast<jclass>(newGlobalRef(env, _parentClass));" + newLine);
+		output.write("    parentClass = static_cast<jclass>(newGlobalRef(_parentClass));" + newLine);
 		output.write("  }" + newLine);
 
 		// copy constructor
@@ -1030,16 +1019,14 @@ public class ProxyGenerator
 		output.write(newLine);
 		output.write("    if (object.parent)" + newLine);
 		output.write("    {" + newLine);
-		output.write("      JNIEnv* env = attach();" + newLine);
-		output.write("      parent = newGlobalRef(env, object.parent);" + newLine);
+		output.write("      parent = newGlobalRef(object.parent);" + newLine);
 		output.write("    }" + newLine);
 		output.write("    else" + newLine);
 		output.write("      parent = 0;" + newLine);
 		output.write(newLine);
 		output.write("    if (object.parentClass)" + newLine);
 		output.write("    {" + newLine);
-		output.write("      JNIEnv* env = attach();" + newLine);
-		output.write("      parentClass = static_cast<jclass>(newGlobalRef(env, object.parentClass));"
+		output.write("      parentClass = static_cast<jclass>(newGlobalRef(object.parentClass));"
 								 + newLine);
 		output.write("    }" + newLine);
 		output.write("    else" + newLine);
@@ -1379,9 +1366,9 @@ public class ProxyGenerator
 
 		output.write(nonConstructors.toString());
 
-		output.write("virtual const JClass& getJavaJniClass() const throw (::jace::JNIException);"
+		output.write("virtual const JClass& getJavaJniClass() const;"
 								 + newLine);
-		output.write("static const JClass& staticGetJavaJniClass() throw (::jace::JNIException);"
+		output.write("static const JClass& staticGetJavaJniClass();"
 								 + newLine);
 		output.write("explicit " + metaClass.getSimpleName() + "(jvalue);" + newLine);
 		output.write("explicit " + metaClass.getSimpleName() + "(jobject);" + newLine);

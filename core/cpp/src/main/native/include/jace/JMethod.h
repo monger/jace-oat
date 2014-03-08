@@ -79,7 +79,7 @@ public:
 		catchAndThrow();
 
 		ResultType result(resultRef);
-		deleteLocalRef(env, resultRef);
+		env->DeleteLocalRef(resultRef);
 
 		return result;
 	}
@@ -110,7 +110,7 @@ public:
 		catchAndThrow();
 
 		ResultType result(resultRef);
-		deleteLocalRef(env, resultRef);
+		env->DeleteLocalRef(resultRef);
 
 		return result;
 	}
@@ -152,18 +152,9 @@ protected:
 
 		if (mMethodID == 0)
 		{
-			std::string msg = "JMethod::getMethodID\n" \
-				"Unable to find method <" + mName + "> with signature <" + methodSignature + ">";
-			try
-			{
-				catchAndThrow();
-			}
-			catch (JNIException& e)
-			{
-				msg.append("\ncaused by:\n");
-				msg.append(e.what());
-			}
-			throw JNIException(msg);
+            THROW_JNI_EXCEPTION(std::string("JMethod::getMethodID\n") +
+				                            "Unable to find method <" + mName + 
+                                            "> with signature <" + methodSignature + ">");
 		}
 
 		//  cout << "JMethod::getMethodID() - Found the method:" << endl;

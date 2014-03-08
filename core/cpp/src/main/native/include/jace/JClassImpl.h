@@ -74,7 +74,7 @@ public:
 	/**
 	 * Returns the JNI representation of this class.
 	 */
-	virtual jclass getClass() const throw (::jace::JNIException);
+	virtual jclass getClass() const;
 
 private:
 	/**

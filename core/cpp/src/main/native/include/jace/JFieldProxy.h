@@ -53,12 +53,11 @@ public:
 	JFieldProxy(jfieldID _fieldID, jvalue value, jobject _parent):
 		FieldType(value), fieldID(_fieldID)
 	{
-		JNIEnv* env = attach();
-
-		if (_parent)
-			parent = newGlobalRef(env, _parent);
-		else
+		if (_parent) {
+			parent = newGlobalRef(_parent);
+		} else {
 			parent = _parent;
+        }
 
 		parentClass = 0;
 	}
@@ -74,8 +73,7 @@ public:
 		FieldType(value), fieldID(_fieldID)
 	{
 		parent = 0;
-		JNIEnv* env = attach();
-		parentClass = newGlobalRef(env, _parentClass);
+		parentClass = newGlobalRef(_parentClass);
 	}
 
 
@@ -88,43 +86,29 @@ public:
 	JFieldProxy(const JFieldProxy& object):
 		FieldType(object.getJavaJniValue())
 	{
-		JNIEnv* env = attach();
-		if (object.parent)
-			parent = newGlobalRef(env, object.parent);
-		else
+		if (object.parent) {
+			parent = newGlobalRef(object.parent);
+		} else {
 			parent = 0;
+        }
 
-		if (object.parentClass)
-			parentClass = static_cast<jclass>(newGlobalRef(env, object.parentClass));
-		else
+		if (object.parentClass) {
+			parentClass = static_cast<jclass>(newGlobalRef(object.parentClass));
+		} else {
 			parentClass = 0;
+        }
 	}
 
 
-	virtual ~JFieldProxy() throw()
-	{
+	virtual ~JFieldProxy() throw () {
 		if (parent)
 		{
-			try
-			{
-				JNIEnv* env = attach();
-				deleteGlobalRef(env, parent);
-			}
-			catch (std::exception&)
-			{
-			}
+			deleteGlobalRef(parent);
 		}
 
 		if (parentClass)
 		{
-			try
-			{
-				JNIEnv* env = attach();
-				deleteGlobalRef(env, parentClass);
-			}
-			catch (std::exception&)
-			{
-			}
+			deleteGlobalRef(parentClass);
 		}
 	}
 
@@ -153,11 +137,10 @@ JFieldProxy< ::jace::proxy::types::JBoolean >::JFieldProxy(jfieldID _fieldID, jv
 {
   if (_parent)
   {
-    JNIEnv* env = attach();
-    parent = newGlobalRef(env, _parent); 
-  }
-  else
+    parent = newGlobalRef(_parent); 
+  } else {
     parent = _parent;
+  }
   
   parentClass = 0;
 }
@@ -167,8 +150,7 @@ JFieldProxy< ::jace::proxy::types::JBoolean >::JFieldProxy(jfieldID _fieldID, jv
   ::jace::proxy::types::JBoolean(value), fieldID(_fieldID)
 {
   parent = 0;
-  JNIEnv* env = attach();
-  parentClass = static_cast<jclass>(newGlobalRef(env, _parentClass)); 
+  parentClass = static_cast<jclass>(newGlobalRef(_parentClass)); 
 }
 
 template <> inline
@@ -177,16 +159,14 @@ JFieldProxy< ::jace::proxy::types::JBoolean >::JFieldProxy(const JFieldProxy< ::
 {
   if (object.parent)
   {
-    JNIEnv* env = attach();
-    parent = newGlobalRef(env, object.parent); 
+    parent = newGlobalRef(object.parent); 
   }
   else
     parent = 0;
 
   if (object.parentClass)
   {
-    JNIEnv* env = attach();
-    parentClass = static_cast<jclass>(newGlobalRef(env, object.parentClass));
+    parentClass = static_cast<jclass>(newGlobalRef(object.parentClass));
   }
   else
     parentClass = 0;
@@ -219,11 +199,10 @@ JFieldProxy< ::jace::proxy::types::JByte >::JFieldProxy(jfieldID _fieldID, jvalu
 {
   if (_parent)
   {
-    JNIEnv* env = attach();
-    parent = newGlobalRef(env, _parent); 
-  }
-  else
+    parent = newGlobalRef(_parent); 
+  } else {
     parent = _parent;
+  }
   
   parentClass = 0;
 }
@@ -234,8 +213,7 @@ JFieldProxy< ::jace::proxy::types::JByte >::JFieldProxy(jfieldID _fieldID, jvalu
   ::jace::proxy::types::JByte(value), fieldID(_fieldID)
 {
   parent = 0;
-  JNIEnv* env = attach();
-  parentClass = static_cast<jclass>(newGlobalRef(env, _parentClass)); 
+  parentClass = static_cast<jclass>(newGlobalRef(_parentClass)); 
 }
 
 template <> inline
@@ -244,16 +222,14 @@ JFieldProxy< ::jace::proxy::types::JByte >::JFieldProxy(const JFieldProxy< ::jac
 {
   if (object.parent)
   {
-    JNIEnv* env = attach();
-    parent = newGlobalRef(env, object.parent); 
+    parent = newGlobalRef(object.parent); 
   }
   else
     parent = 0;
 
   if (object.parentClass)
   {
-    JNIEnv* env = attach();
-    parentClass = static_cast<jclass>(newGlobalRef(env, object.parentClass));
+    parentClass = static_cast<jclass>(newGlobalRef(object.parentClass));
   }
   else
     parentClass = 0;
@@ -287,8 +263,7 @@ JFieldProxy< ::jace::proxy::types::JChar >::JFieldProxy(jfieldID _fieldID, jvalu
 {
   if (_parent)
   {
-    JNIEnv* env = attach();
-    parent = newGlobalRef(env, _parent); 
+    parent = newGlobalRef(_parent); 
   }
   else
     parent = _parent;
@@ -301,8 +276,7 @@ JFieldProxy< ::jace::proxy::types::JChar >::JFieldProxy(jfieldID _fieldID, jvalu
   ::jace::proxy::types::JChar(value), fieldID(_fieldID)
 {
   parent = 0;
-  JNIEnv* env = attach();
-  parentClass = static_cast<jclass>(newGlobalRef(env, _parentClass)); 
+  parentClass = static_cast<jclass>(newGlobalRef(_parentClass)); 
 }
 
 template <> inline
@@ -311,16 +285,14 @@ JFieldProxy< ::jace::proxy::types::JChar >::JFieldProxy(const JFieldProxy< ::jac
 {
   if (object.parent)
   {
-    JNIEnv* env = attach();
-    parent = newGlobalRef(env, object.parent); 
+    parent = newGlobalRef(object.parent); 
   }
   else
     parent = 0;
 
   if (object.parentClass)
   {
-    JNIEnv* env = attach();
-    parentClass = static_cast<jclass>(newGlobalRef(env, object.parentClass));
+    parentClass = static_cast<jclass>(newGlobalRef(object.parentClass));
   }
   else
     parentClass = 0;
@@ -353,11 +325,10 @@ JFieldProxy< ::jace::proxy::types::JShort >::JFieldProxy(jfieldID _fieldID, jval
 {
   if (_parent)
   {
-    JNIEnv* env = attach();
-    parent = newGlobalRef(env, _parent); 
-  }
-  else
+    parent = newGlobalRef(_parent); 
+  } else {
     parent = _parent;
+  }
   
   parentClass = 0;
 }
@@ -367,8 +338,7 @@ JFieldProxy< ::jace::proxy::types::JShort >::JFieldProxy(jfieldID _fieldID, jval
   ::jace::proxy::types::JShort(value), fieldID(_fieldID)
 {
   parent = 0;
-  JNIEnv* env = attach();
-  parentClass = static_cast<jclass>(newGlobalRef(env, _parentClass)); 
+  parentClass = static_cast<jclass>(newGlobalRef(_parentClass)); 
 }
 
 template <> inline
@@ -377,19 +347,17 @@ JFieldProxy< ::jace::proxy::types::JShort >::JFieldProxy(const JFieldProxy< ::ja
 {
   if (object.parent)
   {
-    JNIEnv* env = attach();
-    parent = newGlobalRef(env, object.parent); 
-  }
-  else
+    parent = newGlobalRef(object.parent); 
+  } else {
     parent = 0;
+  }
 
   if (object.parentClass)
   {
-    JNIEnv* env = attach();
-    parentClass = static_cast<jclass>(newGlobalRef(env, object.parentClass));
-  }
-  else
+    parentClass = static_cast<jclass>(newGlobalRef(object.parentClass));
+  } else {
     parentClass = 0;
+  }
 }
 
 template <> inline
@@ -419,11 +387,10 @@ JFieldProxy< ::jace::proxy::types::JInt >::JFieldProxy(jfieldID _fieldID, jvalue
 {
   if (_parent)
   {
-    JNIEnv* env = attach();
-    parent = newGlobalRef(env, _parent); 
-  }
-  else
+    parent = newGlobalRef(_parent); 
+  } else {
     parent = _parent;
+  }
   
   parentClass = 0;
 }
@@ -433,8 +400,7 @@ JFieldProxy< ::jace::proxy::types::JInt >::JFieldProxy(jfieldID _fieldID, jvalue
   ::jace::proxy::types::JInt(value), fieldID(_fieldID)
 {
   parent = 0;
-  JNIEnv* env = attach();
-  parentClass = static_cast<jclass>(newGlobalRef(env, _parentClass)); 
+  parentClass = static_cast<jclass>(newGlobalRef(_parentClass)); 
 }
 
 template <> inline
@@ -443,19 +409,17 @@ JFieldProxy< ::jace::proxy::types::JInt >::JFieldProxy(const JFieldProxy< ::jace
 {
   if (object.parent)
   {
-    JNIEnv* env = attach();
-    parent = newGlobalRef(env, object.parent); 
-  }
-  else
+    parent = newGlobalRef(object.parent); 
+  } else {
     parent = 0;
+  }
 
   if (object.parentClass)
   {
-    JNIEnv* env = attach();
-    parentClass = static_cast<jclass>(newGlobalRef(env, object.parentClass));
-  }
-  else
+    parentClass = static_cast<jclass>(newGlobalRef(object.parentClass));
+  } else {
     parentClass = 0;
+  }
 }
 
 template <> inline
@@ -485,11 +449,10 @@ JFieldProxy< ::jace::proxy::types::JLong >::JFieldProxy(jfieldID _fieldID, jvalu
 {
   if (_parent)
   {
-    JNIEnv* env = attach();
-    parent = newGlobalRef(env, _parent); 
-  }
-  else
+    parent = newGlobalRef(_parent); 
+  } else {
     parent = _parent;
+  }
   
   parentClass = 0;
 }
@@ -499,8 +462,7 @@ JFieldProxy< ::jace::proxy::types::JLong >::JFieldProxy(jfieldID _fieldID, jvalu
   ::jace::proxy::types::JLong(value), fieldID(_fieldID)
 {
   parent = 0;
-  JNIEnv* env = attach();
-  parentClass = static_cast<jclass>(newGlobalRef(env, _parentClass)); 
+  parentClass = static_cast<jclass>(newGlobalRef(_parentClass)); 
 }
 
 template <> inline
@@ -509,19 +471,17 @@ JFieldProxy< ::jace::proxy::types::JLong >::JFieldProxy(const JFieldProxy< ::jac
 {
   if (object.parent)
   {
-    JNIEnv* env = attach();
-    parent = newGlobalRef(env, object.parent); 
-  }
-  else
+    parent = newGlobalRef(object.parent); 
+  } else {
     parent = 0;
+  }
 
   if (object.parentClass)
   {
-    JNIEnv* env = attach();
-    parentClass = static_cast<jclass>(newGlobalRef(env, object.parentClass));
-  }
-  else
+    parentClass = static_cast<jclass>(newGlobalRef(object.parentClass));
+  } else {
     parentClass = 0;
+  }
 }
 
 template <> inline
@@ -550,11 +510,10 @@ JFieldProxy< ::jace::proxy::types::JFloat >::JFieldProxy(jfieldID _fieldID, jval
 {
   if (_parent)
   {
-    JNIEnv* env = attach();
-    parent = newGlobalRef(env, _parent); 
-  }
-  else
+    parent = newGlobalRef(_parent); 
+  } else {
     parent = _parent;
+  }
   
   parentClass = 0;
 }
@@ -564,8 +523,7 @@ JFieldProxy< ::jace::proxy::types::JFloat >::JFieldProxy(jfieldID _fieldID, jval
   ::jace::proxy::types::JFloat(value), fieldID(_fieldID)
 {
   parent = 0;
-  JNIEnv* env = attach();
-  parentClass = static_cast<jclass>(newGlobalRef(env, _parentClass)); 
+  parentClass = static_cast<jclass>(newGlobalRef(_parentClass)); 
 }
 
 template <> inline
@@ -574,19 +532,17 @@ JFieldProxy< ::jace::proxy::types::JFloat >::JFieldProxy(const JFieldProxy< ::ja
 {
   if (object.parent)
   {
-    JNIEnv* env = attach();
-    parent = newGlobalRef(env, object.parent); 
-  }
-  else
+    parent = newGlobalRef(object.parent); 
+  } else {
     parent = 0;
+  }
 
   if (object.parentClass)
   {
-    JNIEnv* env = attach();
-    parentClass = static_cast<jclass>(newGlobalRef(env, object.parentClass));
-  }
-  else
+    parentClass = static_cast<jclass>(newGlobalRef(object.parentClass));
+  } else {
     parentClass = 0;
+  }
 }
 
 template <> inline
@@ -616,11 +572,10 @@ JFieldProxy< ::jace::proxy::types::JDouble >::JFieldProxy(jfieldID _fieldID, jva
 {
   if (_parent)
   {
-    JNIEnv* env = attach();
-    parent = newGlobalRef(env, _parent); 
-  }
-  else
+    parent = newGlobalRef(_parent); 
+  } else {
     parent = _parent;
+  }
   
   parentClass = 0;
 }
@@ -630,8 +585,7 @@ JFieldProxy< ::jace::proxy::types::JDouble >::JFieldProxy(jfieldID _fieldID, jva
   ::jace::proxy::types::JDouble(value), fieldID(_fieldID)
 {
   parent = 0;
-  JNIEnv* env = attach();
-  parentClass = static_cast<jclass>(newGlobalRef(env, _parentClass)); 
+  parentClass = static_cast<jclass>(newGlobalRef(_parentClass)); 
 }
 
 template <> inline
@@ -640,19 +594,17 @@ JFieldProxy< ::jace::proxy::types::JDouble >::JFieldProxy(const JFieldProxy< ::j
 {
   if (object.parent)
   {
-    JNIEnv* env = attach();
-    parent = newGlobalRef(env, object.parent); 
-  }
-  else
+    parent = newGlobalRef(object.parent); 
+  } else {
     parent = 0;
+  }
 
   if (object.parentClass)
   {
-    JNIEnv* env = attach();
-    parentClass = static_cast<jclass>(newGlobalRef(env, object.parentClass));
-  }
-  else
+    parentClass = static_cast<jclass>(newGlobalRef(object.parentClass));
+  } else {
     parentClass = 0;
+  }
 }
 
 template <> inline

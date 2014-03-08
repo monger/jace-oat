@@ -23,14 +23,14 @@ public:
 	 *
 	 * @throw JNIException if an error occurs while trying to retrieve the class.
 	 */
-	virtual const ::jace::JClass& getJavaJniClass() const throw (::jace::JNIException);
+	virtual const ::jace::JClass& getJavaJniClass() const;
 
 	/**
 	 * Returns the JClass for the Void type.
 	 *
 	 * @throw JNIException if an error occurs while trying to retrieve the class.
 	 */
-	static const ::jace::JClass& staticGetJavaJniClass() throw (::jace::JNIException);
+	static const ::jace::JClass& staticGetJavaJniClass();
 };
 
 END_NAMESPACE_3(jace, proxy, types)

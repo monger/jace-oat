@@ -59,8 +59,7 @@ bool JInt::operator!=(JNIType val) const
 }
 
 static boost::mutex javaClassMutex;
-const JClass& JInt::staticGetJavaJniClass() throw (JNIException)
-{
+const JClass& JInt::staticGetJavaJniClass() {
 	static boost::shared_ptr<JClassImpl> result;
 	boost::mutex::scoped_lock lock(javaClassMutex);
 	if (result == 0)
@@ -68,8 +67,7 @@ const JClass& JInt::staticGetJavaJniClass() throw (JNIException)
 	return *result;
 }
 
-const JClass& JInt::getJavaJniClass() const throw (JNIException)
-{
+const JClass& JInt::getJavaJniClass() const {
   return JInt::staticGetJavaJniClass();
 }
 

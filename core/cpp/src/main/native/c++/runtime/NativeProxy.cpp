@@ -29,8 +29,7 @@ static jobject native_invokeNative(JNIEnv* env, jclass cls, jlong ref, jint idx,
 /**
  * Registers the native callback hook if it hasn't been registered.
  */
-static void registerInvokeNativeHook() throw (JNIException)
-{
+static void registerInvokeNativeHook() {
     auto_lock guard(regMtx);
     if (registered) { return; }
     
@@ -58,7 +57,7 @@ static void registerInvokeNativeHook() throw (JNIException)
 /**
  * Implementation of our builder
  */
-Builder::Builder(const std::string& className) throw (JNIException) {
+Builder::Builder(const std::string& className) {
     /* Register our hook */
     registerInvokeNativeHook();
     JNIEnv* env = attach();
@@ -98,15 +97,14 @@ Builder::Builder(const std::string& className) throw (JNIException) {
         THROW_JNI_EXCEPTION("Assert failed: Error instantiating object.");
     }
     
-    m_instance = newGlobalRef(env, instance);
+    m_instance = env->NewGlobalRef(instance);
     env->DeleteLocalRef(instance);
-    m_classRef = static_cast<jclass>(newGlobalRef(env, instClass));
+    m_classRef = static_cast<jclass>(env->NewGlobalRef(instClass));
     env->DeleteLocalRef(instClass);
 }
 Builder::~Builder() {
-    JNIEnv* env = attach();
-    deleteGlobalRef(env, m_classRef);
-    deleteGlobalRef(env, m_instance);
+    deleteGlobalRef(m_classRef);
+    deleteGlobalRef(m_instance);
 }
 
 void Builder::registerCallback(const std::string& name, const Callback& callback) {
@@ -122,15 +120,11 @@ void Builder::registerCallback(const std::string& name, const Callback& callback
                         javaString, 
                         (jlong) ((intptr_t) this), 
                         (jint) m_callbacks.size());
-    try {
-        jace::catchAndThrow();
-	} catch (std::exception& e) {
+    string msg = "Exception thrown invoking NativeInvocation.registerNative()\n";
+    if (messageException(msg)) {
     	env->DeleteLocalRef(javaString);
-		string msg = "Exception thrown invoking NativeInvocation.registerNative()\n";
-		msg.append("caused by:\n");
-		msg.append(e.what());
-		throw JNIException(msg);
-	}
+        throw JNIException(msg);
+    }
     m_callbacks.push_back(callback);
     env->DeleteLocalRef(javaString);
 }
