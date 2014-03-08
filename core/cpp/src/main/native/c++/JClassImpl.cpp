@@ -16,12 +16,7 @@ JClassImpl::JClassImpl(const string& _internalName):
 /**
  * Destroys this JClassImpl.
  */
-JClassImpl::~JClassImpl() throw ()
-{
-	if (theClass) {
-		deleteGlobalRef(theClass);
-    }
-}
+JClassImpl::~JClassImpl() throw () {}
 
 
 const string& JClassImpl::getInternalName() const
