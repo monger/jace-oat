@@ -2,10 +2,7 @@
 using jace::java_new;
 
 #include "jace/DefaultVmLoader.h"
-using jace::DefaultVmLoader;
-
 #include "jace/OptionList.h"
-using jace::OptionList;
 
 #include "jace/JNIException.h"
 using jace::JNIException;
@@ -13,7 +10,6 @@ using jace::JNIException;
 #include "jace/VirtualMachineShutdownError.h"
 using jace::VirtualMachineShutdownError;
 
-#include "jace/runtime/ShutdownHook.h"
 #include "jace/runtime/NativeProxy.h"
 using namespace jace::runtime;
 using jace::runtime::NativeProxy::CallbackArgs;
@@ -78,12 +74,10 @@ int main(int argc, char* argv[])
     }
 
     try {
-        DefaultVmLoader loader(JNI_VERSION_1_6);
-        OptionList list;
+        jace::Loader loader(new jace::DefaultVmLoader(JNI_VERSION_1_6));
+        jace::OptionList list;
         list.push_back(jace::ClassPath(argv[2]));
-        jace::createVm(loader, list, false);
-        /* Try the shutdown hook registration */
-        ShutdownHook::registerShutdownHook();
+        jace::createJavaVm(loader, list);
     
         /* We need to do this in our own scope, so that the proxy gets cleaned up before we destroy the VM */
         {
@@ -130,19 +124,19 @@ int main(int argc, char* argv[])
             https.connect();
         }
             
-        jace::destroyVm();
-        return 0;
-    } catch (VirtualMachineShutdownError&) {
-        cout << "The JVM was terminated in mid-execution. " << endl;
-        return -2;
-    } catch (JNIException& jniException) {
-        cout << "An unexpected JNI error has occurred: " << jniException.what() << endl;
-        return -2;
-    } catch (Throwable& t) {
-        t.printStackTrace();
-        return -2;
-    } catch (exception& e) {
-        cout << "An unexpected C++ error has occurred: " << e.what() << endl;
-        return -2;
-    }
+        jace::resetJavaVm();
+            return 0;
+        } catch (VirtualMachineShutdownError&) {
+            cout << "The JVM was terminated in mid-execution. " << endl;
+            return -2;
+        } catch (JNIException& jniException) {
+            cout << "An unexpected JNI error has occurred: " << jniException.what() << endl;
+            return -2;
+        } catch (Throwable& t) {
+            t.printStackTrace();
+            return -2;
+        } catch (exception& e) {
+            cout << "An unexpected C++ error has occurred: " << e.what() << endl;
+            return -2;
+        }
 }
