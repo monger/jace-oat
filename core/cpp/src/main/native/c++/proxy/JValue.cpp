@@ -30,8 +30,7 @@ JValue::operator jvalue() const
 }
 
 
-void JValue::setJavaJniValue(jvalue value) throw (JNIException)
-{
+void JValue::setJavaJniValue(jvalue value) {
   mValue = value;
 }
 

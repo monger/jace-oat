@@ -29,8 +29,7 @@ static jobject native_invokeNative(JNIEnv* env, jclass cls, jlong ref, jint idx,
 /**
  * Registers the native callback hook if it hasn't been registered.
  */
-static void registerInvokeNativeHook() throw (JNIException)
-{
+static void registerInvokeNativeHook() {
     auto_lock guard(regMtx);
     if (registered) { return; }
     
@@ -48,17 +47,17 @@ static void registerInvokeNativeHook() throw (JNIException)
     };
     int methods_size = sizeof(methods) / sizeof(methods[0]);
     if (env->RegisterNatives(hookClass, methods, methods_size) != JNI_OK) {
-		env->DeleteLocalRef(hookClass);
+		env->DeleteLocalRef(hookClass), hookClass = 0;
         THROW_JNI_EXCEPTION("Unable to register native callback for invokeNative().");
     }
     registered = true;
-    env->DeleteLocalRef(hookClass);
+    env->DeleteLocalRef(hookClass), hookClass = 0;
 }
 
 /**
  * Implementation of our builder
  */
-Builder::Builder(const std::string& className) throw (JNIException) {
+Builder::Builder(const std::string& className) {
     /* Register our hook */
     registerInvokeNativeHook();
     JNIEnv* env = attach();
@@ -69,44 +68,43 @@ Builder::Builder(const std::string& className) throw (JNIException) {
     
 	m_registerCallbackMethod = env->GetMethodID(instClass, "registerNative", "(Ljava/lang/String;JI)V");
 	if (!m_registerCallbackMethod) {
-		env->DeleteLocalRef(instClass);
+		env->DeleteLocalRef(instClass), instClass = 0;
         THROW_JNI_EXCEPTION("Assert failed: Unable to find the method, NativeInvocation.registerNative().");
 	}
     
     m_createProxyMethod = env->GetMethodID(instClass, "createProxy", "()Ljava/lang/Object;");
 	if (!m_createProxyMethod) {
-		env->DeleteLocalRef(instClass);
+		env->DeleteLocalRef(instClass), instClass = 0;
         THROW_JNI_EXCEPTION("Assert failed: Unable to find the method, NativeInvocation.createProxy().");
 	}
     
     jmethodID constructor = env->GetMethodID(instClass, "<init>", "(Ljava/lang/String;)V");
 	if (!constructor) {
-		env->DeleteLocalRef(instClass);
+		env->DeleteLocalRef(instClass), instClass = 0;
         THROW_JNI_EXCEPTION("Assert failed: Unable to find the constructor, NativeInvocation().");
 	}
     
     jstring javaString = env->NewStringUTF(className.c_str());
     if (!javaString) {
-		env->DeleteLocalRef(instClass);
+		env->DeleteLocalRef(instClass), instClass = 0;
         THROW_JNI_EXCEPTION("Assert failed: Error creating java string.");
     }
     
     jobject instance = env->NewObject(instClass, constructor, javaString);
-    env->DeleteLocalRef(javaString);
+    env->DeleteLocalRef(javaString), javaString = 0;
     if (!instance) {
-		env->DeleteLocalRef(instClass);
+		env->DeleteLocalRef(instClass), instClass = 0;
         THROW_JNI_EXCEPTION("Assert failed: Error instantiating object.");
     }
     
-    m_instance = newGlobalRef(env, instance);
-    env->DeleteLocalRef(instance);
-    m_classRef = static_cast<jclass>(newGlobalRef(env, instClass));
-    env->DeleteLocalRef(instClass);
+    m_instance = env->NewGlobalRef(instance);
+    env->DeleteLocalRef(instance), instance = 0;
+    m_classRef = static_cast<jclass>(env->NewGlobalRef(instClass));
+    env->DeleteLocalRef(instClass), instClass = 0;
 }
 Builder::~Builder() {
-    JNIEnv* env = attach();
-    deleteGlobalRef(env, m_classRef);
-    deleteGlobalRef(env, m_instance);
+    deleteGlobalRef(m_classRef), m_classRef = 0;
+    deleteGlobalRef(m_instance), m_instance = 0;
 }
 
 void Builder::registerCallback(const std::string& name, const Callback& callback) {
@@ -122,17 +120,13 @@ void Builder::registerCallback(const std::string& name, const Callback& callback
                         javaString, 
                         (jlong) ((intptr_t) this), 
                         (jint) m_callbacks.size());
-    try {
-        jace::catchAndThrow();
-	} catch (std::exception& e) {
-    	env->DeleteLocalRef(javaString);
-		string msg = "Exception thrown invoking NativeInvocation.registerNative()\n";
-		msg.append("caused by:\n");
-		msg.append(e.what());
-		throw JNIException(msg);
-	}
+    string msg = "Exception thrown invoking NativeInvocation.registerNative()\n";
+    if (messageException(msg)) {
+    	env->DeleteLocalRef(javaString), javaString = 0;
+        throw JNIException(msg);
+    }
     m_callbacks.push_back(callback);
-    env->DeleteLocalRef(javaString);
+    env->DeleteLocalRef(javaString), javaString = 0;
 }
 
 ::jace::proxy::JObject Builder::instantiate() {
@@ -143,8 +137,8 @@ void Builder::registerCallback(const std::string& name, const Callback& callback
     }
 
     ::jace::proxy::JObject returnVal(obj);
-    env->DeleteLocalRef(obj);    
+    env->DeleteLocalRef(obj), obj = 0;
     return returnVal;
 }
 
-END_NAMESPACE_3(jace, runtime, ShutdownHook)
+END_NAMESPACE_3(jace, runtime, NativeProxy)

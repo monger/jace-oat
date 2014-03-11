@@ -1,7 +1,6 @@
 #ifndef JACE_TYPES_JDOUBLE_H
 #define JACE_TYPES_JDOUBLE_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 #include "jace/Jace.h"
 #include "jace/JClass.h"
@@ -26,52 +25,52 @@ public:
 	/**
 	 * Creates a new JDouble with the given value.
 	 */
-	JACE_API JDouble(jvalue value);
+	JDouble(jvalue value);
 
 	/**
 	 * Creates a new JDouble with the given value.
 	 */
-	JACE_API JDouble(JNIType value);
+	JDouble(JNIType value);
 
 	/**
 	 * Destroys the existing java object.
 	 */
-	JACE_API virtual ~JDouble();
+	virtual ~JDouble();
 
 	/**
 	 * Returns the value of this instance.
 	 */
-	JACE_API operator JNIType() const;
+	operator JNIType() const;
 
 	/**
 	 * Compares this instance to another.
 	 */
-	JACE_API bool operator==(const JDouble& value) const;
+	bool operator==(const JDouble& value) const;
 
 	/**
 	 * Compares this instance to another.
 	 */
-	JACE_API bool operator!=(const JDouble& value) const;
+	bool operator!=(const JDouble& value) const;
 
 	/**
 	 * Compares this instance to another.
 	 */
-	JACE_API bool operator==(JNIType value) const;
+	bool operator==(JNIType value) const;
 
 	/**
 	 * Compares this instance to another.
 	 */
-	JACE_API bool operator!=(JNIType value) const;
+	bool operator!=(JNIType value) const;
 
 	/**
 	 * Returns the JClass for this class.
 	 */
-	JACE_API static const ::jace::JClass& staticGetJavaJniClass() throw (::jace::JNIException);
+	static const ::jace::JClass& staticGetJavaJniClass();
 
 	/**
 	 * Returns the JClass for this instance.
 	 */
-	JACE_API virtual const ::jace::JClass& getJavaJniClass() const throw (::jace::JNIException);
+	virtual const ::jace::JClass& getJavaJniClass() const;
 };
 
 

@@ -32,11 +32,3 @@ vector<jvalue> toVector(const JArguments& arguments)
 }
 
 END_NAMESPACE(jace)
-
-/**
- * For those (oddball) compilers that need the template specialization
- * definitions in the header.
- */
-#ifndef PUT_TSDS_IN_HEADER
-  #include "jace/JMethod.tsd"
-#endif

@@ -2,9 +2,7 @@
 
 #include "jace/JClassImpl.h"
 
-#include "jace/BoostWarningOff.h"
 #include <boost/thread/mutex.hpp>
-#include "jace/BoostWarningOn.h"
 
 BEGIN_NAMESPACE_3(jace, proxy, types)
 
@@ -49,8 +47,7 @@ bool JBoolean::operator!=(JNIType val) const
 }
 
 static boost::mutex javaClassMutex;
-const JClass& JBoolean::staticGetJavaJniClass() throw (JNIException)
-{
+const JClass& JBoolean::staticGetJavaJniClass() {
 	static boost::shared_ptr<JClassImpl> result;
 	boost::mutex::scoped_lock lock(javaClassMutex);
 	if (result == 0)
@@ -58,8 +55,7 @@ const JClass& JBoolean::staticGetJavaJniClass() throw (JNIException)
 	return *result;
 }
 
-const JClass& JBoolean::getJavaJniClass() const throw (JNIException)
-{
+const JClass& JBoolean::getJavaJniClass() const {
   return JBoolean::staticGetJavaJniClass();
 }
 

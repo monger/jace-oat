@@ -2,10 +2,7 @@
 using jace::java_new;
 
 #include "jace/DefaultVmLoader.h"
-using jace::DefaultVmLoader;
-
 #include "jace/OptionList.h"
-using jace::OptionList;
 
 #include "jace/JArray.h"
 using jace::JArray;
@@ -50,9 +47,9 @@ int main()
 {
 	try
 	{
-		DefaultVmLoader loader(JNI_VERSION_1_6);
-		OptionList list;
-		jace::createVm(loader, list, false);
+		jace::Loader loader(new jace::DefaultVmLoader(JNI_VERSION_1_6));
+		jace::OptionList list;
+		jace::createJavaVm(loader, list);
 		for (int i = 0; i < 1000; ++i)
 		{
 			String s1("Hello World");
@@ -71,7 +68,7 @@ int main()
 
 			cout << i << endl;
 		}
-        jace::destroyVm();
+        jace::resetJavaVm();
 		return 0;
 	}
 	catch (VirtualMachineShutdownError&)

@@ -1,7 +1,6 @@
 #ifndef JACE_RUNTIME_NATIVEPROXY_H
 #define JACE_RUNTIME_NATIVEPROXY_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 #include "jace/JNIException.h"
 
@@ -115,10 +114,10 @@ private:
 
 class Builder : public boost::noncopyable {
 public:
-    Builder(const std::string& className) throw (JNIException);
+    Builder(const std::string& className);
     ~Builder();
     void registerCallback(const std::string& name, const Callback& callback);
-    template <typename T> T build() throw (JNIException) {
+    template <typename T> T build() {
         ::jace::proxy::JObject obj = instantiate();
         if (::jace::instanceof<T>(obj)) {
             return ::jace::java_cast<T>(obj);

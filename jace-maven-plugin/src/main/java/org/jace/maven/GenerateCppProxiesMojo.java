@@ -75,12 +75,6 @@ public class GenerateCppProxiesMojo
 	 */
 	private String accessibility;
 	/**
-	 * Indicates if the proxy symbols should be exported (for generating DLLs/SOs).
-	 *
-	 * @parameter default-value="false"
-	 */
-	private boolean exportSymbols;
-	/**
 	 * Indicates whether classes should be exported even if they are not referenced by the input
 	 * files.
 	 *
@@ -131,7 +125,7 @@ public class GenerateCppProxiesMojo
 			classpathList = Arrays.asList(classpath);
 		AutoProxy.Builder autoProxy = new AutoProxy.Builder(inputHeaderFiles, inputSourceFiles,
 			outputHeaders, outputSources, new ClassPath(classpathList)).accessibility(accessibilityType).
-			minimizeDependencies(minimizeDependencies).exportSymbols(exportSymbols);
+			minimizeDependencies(minimizeDependencies);
 		for (TypeName dependency: extraDependencies)
 			autoProxy.extraDependency(dependency);
 		try

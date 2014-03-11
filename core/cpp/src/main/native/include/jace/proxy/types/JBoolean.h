@@ -1,7 +1,6 @@
 #ifndef JACE_TYPES_JBOOLEAN_H
 #define JACE_TYPES_JBOOLEAN_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 #include "jace/Jace.h"
 #include "jace/JClass.h"
@@ -32,52 +31,52 @@ public:
 	/**
 	 * Creates a new instance with the given value.
 	 */
-	JACE_API JBoolean(jvalue value);
+	JBoolean(jvalue value);
 
 	/**
 	 * Creates a new instance with the given value.
 	 */
-	JACE_API JBoolean(JNIType value);
+	JBoolean(JNIType value);
 
 	/**
 	 * Destroys the existing java object.
 	 */
-	JACE_API virtual ~JBoolean();
+	virtual ~JBoolean();
 
 	/**
 	 * Returns the value of this instance.
 	 */
-	JACE_API operator JNIType() const;
+	operator JNIType() const;
 
 	/**
 	 * Compares this JBoolean to another.
 	 */
-	JACE_API bool operator==(const JBoolean& _boolean) const;
+	bool operator==(const JBoolean& _boolean) const;
 
 	/**
 	 * Compares this JBoolean to another.
 	 */
-	JACE_API bool operator!=(const JBoolean& _boolean) const;
+	bool operator!=(const JBoolean& _boolean) const;
 
 	/**
 	 * Compares this JBoolean to a JNIType.
 	 */
-	JACE_API bool operator==(JNIType val) const;
+	bool operator==(JNIType val) const;
 
 	/**
 	 * Compares this JBoolean to a JNIType.
 	 */
-	JACE_API bool operator!=(JNIType val) const;
+	bool operator!=(JNIType val) const;
 
 	/**
 	 * Returns the JClass for this class.
 	 */
-	JACE_API static const ::jace::JClass& staticGetJavaJniClass() throw (::jace::JNIException);
+	static const ::jace::JClass& staticGetJavaJniClass();
 
 	/**
 	 * Returns the JClass for this instance.
 	 */
-	JACE_API virtual const ::jace::JClass& getJavaJniClass() const throw (::jace::JNIException);
+	virtual const ::jace::JClass& getJavaJniClass() const;
 
 	friend class ::jace::ElementProxy<JBoolean>;
 	friend class ::jace::JFieldProxy<JBoolean>;

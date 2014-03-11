@@ -17,9 +17,7 @@ public:
 	/**
 	 * Creates a new VirtualMachineShutdownError with the given message.
 	 */
-	VirtualMachineShutdownError(const std::string& value) throw ():
-			JNIException(value)
-	{}
+	VirtualMachineShutdownError(const std::string& value) throw () : JNIException(value) {}
 };
 
 END_NAMESPACE(jace)

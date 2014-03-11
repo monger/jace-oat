@@ -1,7 +1,6 @@
 #ifndef JACE_TYPES_JLONG_H
 #define JACE_TYPES_JLONG_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 #include "jace/Jace.h"
 #include "jace/JClass.h"
@@ -28,60 +27,60 @@ public:
 	/**
 	 * Creates a new instance with the given value.
 	 */
-	JACE_API JLong(jvalue value);
+	JLong(jvalue value);
 
 	/**
 	 * Creates a new instance with the given value.
 	 */
-	JACE_API JLong(JNIType _long);
+	JLong(JNIType _long);
 
 	/**
 	 * Creates a new instance with the given value.
 	 */
-	JACE_API JLong(const ::jace::proxy::types::JInt& _int);
+	JLong(const ::jace::proxy::types::JInt& _int);
 
 	/**
 	 * Destroys the existing java object.
 	 */
-	JACE_API virtual ~JLong();
+	virtual ~JLong();
 
 	/**
 	 * Returns the value of this instance.
 	 */
-	JACE_API operator JNIType() const;
+	operator JNIType() const;
 
 	/**
 	 * Compares this instance to another.
 	 */
-	JACE_API bool operator==(const JLong& _long) const;
+	bool operator==(const JLong& _long) const;
 
 	/**
 	 * Compares this instance to another.
 	 */
-	JACE_API bool operator!=(const JLong& _long) const;
+	bool operator!=(const JLong& _long) const;
 
 
 	/**
 	 * Compares this instance to a primitive.
 	 */
-	JACE_API bool operator==(JNIType val) const;
+	bool operator==(JNIType val) const;
 
 	/**
 	 * Compares this instance to a primitive.
 	 */
-	JACE_API bool operator!=(JNIType val) const;
+	bool operator!=(JNIType val) const;
 
 	/**
 	 * Returns the JClass for this class.
 	 */
-	JACE_API static const ::jace::JClass& staticGetJavaJniClass() throw (::jace::JNIException);
+	static const ::jace::JClass& staticGetJavaJniClass();
 
 	/**
 	 * Retrieves the JavaClass for this JObject.
 	 *
 	 * @throw JNIException if an error occurs while trying to retrieve the class.
 	 */
-	JACE_API virtual const ::jace::JClass& getJavaJniClass() const throw (::jace::JNIException);
+	virtual const ::jace::JClass& getJavaJniClass() const;
 };
 
 

@@ -1,7 +1,6 @@
 #ifndef JACE_VM_LOADER
 #define JACE_VM_LOADER
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 #include "jace/JNIException.h"
 
@@ -40,24 +39,24 @@ public:
 	 *
 	 * @param jniVersion the JNI version the JVM must support.
 	 */
-	JACE_API VmLoader(jint jniVersion = DEFAULT_JNI_VERSION);
+	VmLoader(jint jniVersion = DEFAULT_JNI_VERSION);
 
   /**
    * Returns the the JNI version the JVM must support.
    */
-  JACE_API virtual jint getJniVersion() const;
+  virtual jint getJniVersion() const;
 
   /**
    * Invokes JNI_CreateJavaVM.
    */
-  JACE_API virtual jint createJavaVM(JavaVM** pvm, void** env, void* args) const = 0;
+  virtual jint createJavaVM(JavaVM** pvm, void** env, void* args) const = 0;
 
   /**
    * Invokes JNI_GetCreatedJavaVMs.
    */
-  JACE_API virtual jint getCreatedJavaVMs(JavaVM** vmBuf, jsize bufLen, jsize* nVMs) const = 0;
+  virtual jint getCreatedJavaVMs(JavaVM** vmBuf, jsize bufLen, jsize* nVMs) const = 0;
 
-	JACE_API virtual ~VmLoader() {}
+	virtual ~VmLoader() {}
 private:
 	/**
 	 * Prevent copying.

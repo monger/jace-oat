@@ -1,7 +1,6 @@
 #ifndef JACE_OPTION_LIST_H
 #define JACE_OPTION_LIST_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 #include "jace/JNIException.h"
 
@@ -10,9 +9,7 @@
 #include <vector>
 #include <string>
 
-#include "jace/BoostWarningOff.h"
 #include <boost/shared_ptr.hpp>
-#include "jace/BoostWarningOn.h"
 
 BEGIN_NAMESPACE(jace)
 
@@ -26,25 +23,25 @@ BEGIN_NAMESPACE(jace)
 class Option
 {
 public:
-  JACE_API virtual ~Option() {}
+  virtual ~Option() {}
 
   /**
    * Returns the text string value of the option.
    * For example, "-Djava.class.path=c:\foo\myclasses"
    */
-  JACE_API virtual const std::string stringValue() const = 0;
+  virtual const std::string stringValue() const = 0;
 
   /**
    * Returns the extra data required for an option,
    * for example, a pointer to a vfprintf hook.
    * Returns NULL if no extra data is required.
    */
-  JACE_API virtual void* extraInfo() = 0;
+  virtual void* extraInfo() = 0;
 
   /**
    * Returns a dynamically allocated copy of the Option.
    */
-  JACE_API virtual Option* clone() const = 0;
+  virtual Option* clone() const = 0;
 };
 
 /**
@@ -60,27 +57,27 @@ public:
   /**
    * Creates a new empty OptionList.
    */
-  JACE_API OptionList();
+  OptionList();
 
   /**
    * Adds a clone of option to the list.
    */
-  JACE_API void push_back(const Option& option);
+  void push_back(const Option& option);
 
   /**
    * Returns the size of the list.
    */
-  JACE_API size_t size() const;
+  size_t size() const;
 
   /**
    * Returns an iterator to the beginning of the list.
    */
-	JACE_API std::vector<OptionPtr>::const_iterator begin() const;
+	std::vector<OptionPtr>::const_iterator begin() const;
 
   /**
    * Returns an iterator to the beginning of the list.
    */
-  JACE_API std::vector<OptionPtr>::const_iterator end() const;
+  std::vector<OptionPtr>::const_iterator end() const;
 
   /**
    * Returns the OptionList as an array of JNI options.
@@ -88,12 +85,12 @@ public:
    * The caller must deallocate the options by making a call
    * to destroyJniOptions().
    */
-  JACE_API JavaVMOption* createJniOptions() const;
+  JavaVMOption* createJniOptions() const;
 
   /**
    * Releases the options created by a call to createJniOptions().
    */
-  JACE_API void destroyJniOptions(JavaVMOption* jniOptions) const;
+  void destroyJniOptions(JavaVMOption* jniOptions) const;
 
 private:
 	/**
@@ -115,30 +112,29 @@ public:
   /**
    * Creates a new SystemProperty with the specified name and value.
    *
-   * @param name the property name (encoded using the default platform encoding)
-   * @param value the property name (encoded using the default platform encoding)
-   * @see jace::toPlatformEncoding(std::wstring)
+   * @param name the property name
+   * @param value the property name
    */
-  JACE_API SystemProperty(const std::string& name, const std::string& value);
+  SystemProperty(const std::string& name, const std::string& value);
 
 	/**
 	 * Copy constructor.
 	 */
-	JACE_API SystemProperty(const SystemProperty& other);
+	SystemProperty(const SystemProperty& other);
 
 	/**
    * Returns the name of the SystemProperty.
    */
-  JACE_API virtual const std::string name();
+  virtual const std::string name();
 
   /**
    * Returns the value of the SystemProperty.
    */
-  JACE_API virtual const std::string value();
+  virtual const std::string value();
 
-  JACE_API virtual const std::string stringValue() const;
-  JACE_API virtual void* extraInfo();
-  JACE_API virtual Option* clone() const;
+  virtual const std::string stringValue() const;
+  virtual void* extraInfo();
+  virtual Option* clone() const;
 
 private:
 	/**
@@ -160,8 +156,7 @@ private:
 		/**
 		 * Creates a new "java.version" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: Version(const std::string& value ): SystemProperty("java.version", value) {}
   };
@@ -171,8 +166,7 @@ private:
 		/**
 		 * Creates a new "java.vendor" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: Vendor(const std::string& value): SystemProperty("java.vendor", value) {}
   };
@@ -182,8 +176,7 @@ private:
 		/**
 		 * Creates a new "java.vendor.url" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: VendorUrl(const std::string& value): SystemProperty("java.vendor.url", value) {}
   };
@@ -193,8 +186,7 @@ private:
 		/**
 		 * Creates a new "java.home" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: Home(const std::string& value): SystemProperty("java.home", value) {}
   };
@@ -204,8 +196,7 @@ private:
 		/**
 		 * Creates a new "java.vm.specification.version" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: VmSpecificationVersion(const std::string& value): SystemProperty("java.vm.specification.version", value) {}
   };
@@ -215,8 +206,7 @@ private:
 		/**
 		 * Creates a new "java.vm.specification.vendor" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: VmSpecificationVendor(const std::string& value): SystemProperty("java.vm.specification.vendor", value) {}
   };
@@ -226,8 +216,7 @@ private:
 		/**
 		 * Creates a new "java.vm.specification.name" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: VmSpecificationName(const std::string& value): SystemProperty("java.vm.specification.name", value) {}
   };
@@ -237,8 +226,7 @@ private:
 		/**
 		 * Creates a new "java.vm.version" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: VmVersion(const std::string& value): SystemProperty("java.vm.version", value) {}
   };
@@ -248,8 +236,7 @@ private:
 		/**
 		 * Creates a new "java.vm.vendor" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: VmVendor(const std::string& value): SystemProperty("java.vm.vendor", value) {}
   };
@@ -259,8 +246,7 @@ private:
 		/**
 		 * Creates a new "java.vm.name" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: VmName(const std::string& value): SystemProperty("java.vm.name", value) {}
   };
@@ -270,8 +256,7 @@ private:
 		/**
 		 * Creates a new "java.specification.version" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: SpecificationVersion(const std::string& value): SystemProperty("java.specification.version", value) {}
   };
@@ -281,8 +266,7 @@ private:
 		/**
 		 * Creates a new "java.specification.vendor" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: SpecificationVendor(const std::string& value): SystemProperty("java.specification.vendor", value) {}
   };
@@ -292,8 +276,7 @@ private:
 		/**
 		 * Creates a new "java.specification.name" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: SpecificationName(const std::string& value): SystemProperty("java.specification.name", value) {}
   };
@@ -303,8 +286,7 @@ private:
 		/**
 		 * Creates a new "java.class.version" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: ClassVersion(const std::string& value): SystemProperty("java.class.version", value) {}
   };
@@ -314,8 +296,7 @@ private:
 		/**
 		 * Creates a new "java.class.path" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: ClassPath(const std::string& value): SystemProperty("java.class.path", value) {}
   };
@@ -325,8 +306,7 @@ private:
 		/**
 		 * Creates a new "java.library.path" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: LibraryPath(const std::string& value): SystemProperty("java.library.path", value) {}
   };
@@ -336,8 +316,7 @@ private:
 		/**
 		 * Creates a new "java.io.tmpdir" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: IoTmpDir(const std::string& value): SystemProperty("java.io.tmpdir", value) {}
   };
@@ -347,8 +326,7 @@ private:
 		/**
 		 * Creates a new "java.compiler" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: Compiler(const std::string& value): SystemProperty("java.compiler", value) {}
   };
@@ -358,8 +336,7 @@ private:
 		/**
 		 * Creates a new "java.ext.dirs" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: ExtDirs(const std::string& value): SystemProperty("java.ext.dirs", value) {}
   };
@@ -369,8 +346,7 @@ private:
 		/**
 		 * Creates a new "java.os.name" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: OsName(const std::string& value): SystemProperty("java.os.name", value) {}
   };
@@ -380,8 +356,7 @@ private:
 		/**
 		 * Creates a new "java.os.arch" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: OsArch(const std::string& value): SystemProperty("java.os.arch", value) {}
   };
@@ -391,8 +366,7 @@ private:
 		/**
 		 * Creates a new "java.os.version" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: OsVersion(const std::string& value): SystemProperty("java.os.version", value) {}
   };
@@ -402,8 +376,7 @@ private:
 		/**
 		 * Creates a new "file.separator" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: FileSeparator(const std::string& value): SystemProperty("file.separator", value) {}
   };
@@ -413,8 +386,7 @@ private:
 		/**
 		 * Creates a new "path.separator" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: PathSeparator(const std::string& value): SystemProperty("path.separator", value) {}
   };
@@ -424,8 +396,7 @@ private:
 		/**
 		 * Creates a new "line.separator" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: LineSeparator(const std::string& value ): SystemProperty("line.separator", value) {}
   };
@@ -435,8 +406,7 @@ private:
 		/**
 		 * Creates a new "user.name" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: UserName(const std::string& value): SystemProperty("user.name", value) {}
   };
@@ -446,8 +416,7 @@ private:
 		/**
 		 * Creates a new "user.home" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: UserHome(const std::string& value): SystemProperty("user.home", value) {}
   };
@@ -457,8 +426,7 @@ private:
 		/**
 		 * Creates a new "user.dir" property with the specified value.
 		 *
-		 * @param value the property name (encoded using the default platform encoding)
-		 * @see jace::toPlatformEncoding(std::wstring)
+		 * @param value the property name
 		 */
     public: UserDir(const std::string& value) : SystemProperty("user.dir", value) {}
   };
@@ -476,7 +444,7 @@ public:
 	/**
 	 * The component that should output verbosely.
 	 */
-	JACE_API enum ComponentType {
+	enum ComponentType {
 		/**
 		 * The garbage collector.
 		 */
@@ -496,16 +464,16 @@ public:
 	 *
 	 * @param component the component type
 	 */
-  JACE_API Verbose(ComponentType component);
+  Verbose(ComponentType component);
 
 	/**
 	 * Copy constructor.
 	 */
-	JACE_API Verbose(const Verbose& other);
+	Verbose(const Verbose& other);
 
-  JACE_API virtual const std::string stringValue() const;
-  JACE_API virtual void* extraInfo();
-  JACE_API virtual Option* clone() const;
+  virtual const std::string stringValue() const;
+  virtual void* extraInfo();
+  virtual Option* clone() const;
 
 private:
 	/**
@@ -532,39 +500,37 @@ public:
 	/**
 	 * Creates a new JavaAgent.
 	 *
-	 * @param path the path to the JavaAgent (encoded using the default platform encoding)
-	 * @see jace::toPlatformEncoding(std::wstring)
+	 * @param path the path to the JavaAgent
 	 */
-  JACE_API JavaAgent(const std::string& path);
+  JavaAgent(const std::string& path);
 
 	/**
 	 * Creates a new JavaAgent.
 	 *
-	 * @param path the path to the JavaAgent (encoded using the default platform encoding)
-	 * @param options the agent options (encoded using the default platform encoding)
-	 * @see jace::toPlatformEncoding(std::wstring)
+	 * @param path the path to the JavaAgent
+	 * @param options the agent options
 	 */
-	JACE_API JavaAgent(const std::string& path, const std::string& options);
+	JavaAgent(const std::string& path, const std::string& options);
 
 	/**
 	 * Copy constructor.
 	 */
-	JACE_API JavaAgent(const JavaAgent& other);
+	JavaAgent(const JavaAgent& other);
 
 	/**
    * Returns the path of the Java agent.
    *
    */
-  JACE_API virtual const std::string path();
+  virtual const std::string path();
 
 	/**
    * Returns the Java agent options.
    *
    */
-  JACE_API virtual const std::string options();
-  JACE_API virtual const std::string stringValue() const;
-  JACE_API virtual void* extraInfo();
-  JACE_API virtual Option* clone() const;
+  virtual const std::string options();
+  virtual const std::string stringValue() const;
+  virtual void* extraInfo();
+  virtual Option* clone() const;
 
 private:
 	/**
@@ -598,19 +564,18 @@ public:
   /**
    * Creates a new custom option.
 	 *
-	 * @param value the option value (encoded using the default platform encoding)
-	 * @see jace::toPlatformEncoding(std::wstring)
+	 * @param value the option value
    */
-  JACE_API CustomOption(const std::string& value);
+  CustomOption(const std::string& value);
 
 	/**
 	 * Copy constructor.
 	 */
-	JACE_API CustomOption(const CustomOption& other);
+	CustomOption(const CustomOption& other);
 
-	JACE_API virtual const std::string stringValue() const;
-  JACE_API virtual void* extraInfo();
-  JACE_API virtual Option* clone() const;
+	virtual const std::string stringValue() const;
+  virtual void* extraInfo();
+  virtual Option* clone() const;
 
 private:
 	/**
@@ -638,11 +603,11 @@ class VfprintfHook: public Hook
 public:
   typedef int (*vfprintf_t)(FILE* fp, const char* format, va_list arg);
 
-  JACE_API VfprintfHook(vfprintf_t hook_);
+  VfprintfHook(vfprintf_t hook_);
 
-  JACE_API virtual const std::string stringValue() const;
-  JACE_API virtual void* extraInfo();
-  JACE_API virtual Option* clone() const;
+  virtual const std::string stringValue() const;
+  virtual void* extraInfo();
+  virtual Option* clone() const;
 
 private:
   vfprintf_t hook;
@@ -656,11 +621,11 @@ class ExitHook: public Hook
 public:
   typedef void (*exit_t)(int status);
 
-  JACE_API ExitHook(exit_t _hook);
+  ExitHook(exit_t _hook);
 
-  JACE_API virtual const std::string stringValue() const;
-  JACE_API virtual void* extraInfo();
-  JACE_API virtual Option* clone() const;
+  virtual const std::string stringValue() const;
+  virtual void* extraInfo();
+  virtual Option* clone() const;
 
 private:
   exit_t hook;
@@ -675,11 +640,11 @@ class AbortHook: public Hook
 public:
   typedef void (*abort_t) (void);
 
-  JACE_API AbortHook(abort_t _hook);
+  AbortHook(abort_t _hook);
 
-  JACE_API virtual const std::string stringValue() const;
-  JACE_API virtual void* extraInfo();
-  JACE_API virtual Option* clone() const;
+  virtual const std::string stringValue() const;
+  virtual void* extraInfo();
+  virtual Option* clone() const;
 
 private:
   abort_t hook;

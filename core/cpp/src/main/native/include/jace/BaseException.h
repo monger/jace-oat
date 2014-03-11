@@ -1,7 +1,6 @@
 #ifndef JACE_BASE_EXCEPTION_H
 #define JACE_BASE_EXCEPTION_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 
 #include <string>
@@ -34,30 +33,30 @@ public:
 	/**
 	 * Creates a new Exception with the given mesage.
 	 */
-	JACE_API BaseException(const std::string& value) throw ();
+	BaseException(const std::string& value) throw ();
 
 	/**
 	 * Creates a new Exception from the given Exception.
 	 */
-	JACE_API BaseException(const BaseException& rhs) throw ();
+	BaseException(const BaseException& rhs) throw ();
 
 	/**
 	 * Assigns this Exception to the given Exception.
 	 *
 	 */
-	JACE_API BaseException& operator=(const BaseException& rhs) throw ();
+	BaseException& operator=(const BaseException& rhs) throw ();
 
 	/**
 	 * Destroys this Exception.
 	 *
 	 */
-	JACE_API virtual ~BaseException() throw ();
+	virtual ~BaseException() throw ();
 
 	/**
 	 * Returns the message this Exception was created with.
 	 *
 	 */
-	JACE_API virtual const char *what() const throw ();
+	virtual const char *what() const throw ();
 
 private:
 	/**

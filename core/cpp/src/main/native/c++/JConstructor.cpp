@@ -133,21 +133,10 @@ jmethodID JConstructor::getMethodID(const JClass& jClass, const JArguments& argu
 
   mMethodID = env->GetMethodID(jClass.getClass(), "<init>", methodSignature.c_str());
 
-  if (mMethodID == 0)
-	{
-		string msg = string("JConstructor::getMethodID(): ") +
-                 "Unable to find constructor for " + jClass.getInternalName() + 
-				 " with signature " + methodSignature;
-		try
-		{
-			catchAndThrow();
-		}
-		catch (std::exception& e)
-		{
-			msg.append("\ncaused by:\n");
-			msg.append(e.what());
-		}
-    throw JNIException(msg);
+  if (mMethodID == 0) {
+      THROW_JNI_EXCEPTION(string("JConstructor::getMethodID(): ") +
+                                 "Unable to find constructor for " + jClass.getInternalName() + 
+				                 " with signature " + methodSignature);
   }
 
   return mMethodID;

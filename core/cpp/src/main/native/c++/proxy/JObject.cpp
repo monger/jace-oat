@@ -14,9 +14,7 @@ using std::endl;
 #include <exception>
 using std::exception;
 
-#include "jace/BoostWarningOff.h"
 #include <boost/thread/mutex.hpp>
-#include "jace/BoostWarningOn.h"
 
 BEGIN_NAMESPACE_2(jace, proxy)
 
@@ -64,11 +62,8 @@ JObject::~JObject() throw ()
 	try
 	{
 		jobject ref = *this;
-		if (ref)
-		{
-			// skip for null references
-			JNIEnv* env = attach();
-			deleteGlobalRef(env, ref);
+		if (ref) {
+			deleteGlobalRef(ref), ref = 0;
 		}
 	}
 	catch (VirtualMachineShutdownError&)
@@ -128,8 +123,7 @@ JObject& JObject::operator=(const JObject& object)
  * This method is simply a convenience method for calling 
  * setValue(jvalue) with a jobject.
  */
-void JObject::setJavaJniObject(jobject object) throw (JNIException)
-{
+void JObject::setJavaJniObject(jobject object) {
   jvalue value;
   value.l = object;
   setJavaJniValue(value);
@@ -144,31 +138,29 @@ void JObject::setJavaJniObject(jobject object) throw (JNIException)
  * @throw JNIException if the JVM runs out of memory while 
  *   trying to create a new global reference.
  */
-void JObject::setJavaJniValue(jvalue newValue) throw (JNIException)
-{
+void JObject::setJavaJniValue(jvalue newValue) {
   JNIEnv* env = attach();
 
 	// Save a copy of the old value
   jobject oldValue = *this;
-	if (env->IsSameObject(newValue.l, oldValue) == JNI_TRUE)
-		return;
-	jvalue ourCopy;
-
-  if (!newValue.l)
-	{
-		// If the new value is a null reference, we save time by not creating a new global reference.
-		ourCopy = newValue;
+  if (env->IsSameObject(newValue.l, oldValue) == JNI_TRUE) {
+      return;
   }
-	else
-	{
-		// Create our own global reference to the object
-		jobject object = newGlobalRef(env, newValue.l);
-		ourCopy.l = object;
-	}
+  jvalue ourCopy;
+
+  if (!newValue.l) {
+      // If the new value is a null reference, we save time by not creating a new global reference.
+      ourCopy = newValue;
+  } else {
+      // Create our own global reference to the object
+      jobject object = env->NewGlobalRef(newValue.l);
+      ourCopy.l = object;
+  }
 
 	// Delete the old value
-  if (oldValue)
-    deleteGlobalRef(env, oldValue);
+  if (oldValue) {
+      env->DeleteGlobalRef(oldValue), oldValue = 0;
+  }
   JValue::setJavaJniValue(ourCopy);
 }
 
@@ -189,8 +181,7 @@ jobject JObject::newObject(const JClass& jClass, const JArguments& arguments)
 }
 
 static boost::mutex javaClassMutex;
-const JClass& JObject::staticGetJavaJniClass() throw (JNIException)
-{
+const JClass& JObject::staticGetJavaJniClass() {
 	static boost::shared_ptr<JClassImpl> result;
 	boost::mutex::scoped_lock lock(javaClassMutex);
 	if (result == 0)
@@ -198,8 +189,7 @@ const JClass& JObject::staticGetJavaJniClass() throw (JNIException)
 	return *result;
 }
 
-const JClass& JObject::getJavaJniClass() const throw (JNIException)
-{
+const JClass& JObject::getJavaJniClass() const {
   return staticGetJavaJniClass();
 }
 

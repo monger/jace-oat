@@ -6,9 +6,7 @@ using std::string;
 #include <list>
 using std::list;
 
-#include "jace/BoostWarningOff.h"
 #include <boost/ref.hpp>
-#include "jace/BoostWarningOn.h"
 
 
 /**

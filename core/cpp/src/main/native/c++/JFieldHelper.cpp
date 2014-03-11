@@ -71,20 +71,9 @@ jfieldID JFieldHelper::getFieldID(const JClass& parentClass, bool isStatic)
   else
     mFieldID = env->GetFieldID(parentClass.getClass(), mName.c_str(), signature.c_str());
 
-  if (mFieldID == 0)
-	{
-    string msg = "JFieldHelper::getFieldID\n" \
-                 "Unable to find field <" + mName + "> with signature <" + signature + ">";
-		try
-		{
-			catchAndThrow();
-		}
-		catch (JNIException& e)
-		{
-			msg.append("\ncaused by:\n");
-			msg.append(e.what());
-		}
-    throw JNIException(msg);
+  if (mFieldID == 0) {
+      THROW_JNI_EXCEPTION(string("JFieldHelper::getFieldID\n") +
+                                 "Unable to find field <" + mName + "> with signature <" + signature + ">");
   }
 
 //  cout << "JMethod::getMethodID() - Found the method:" << endl;

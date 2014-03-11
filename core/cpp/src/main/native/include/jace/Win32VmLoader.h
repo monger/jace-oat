@@ -1,11 +1,7 @@
-#ifndef JACE_OsDep_H
-#include "jace/OsDep.h"
-#endif
-
-#ifdef _WIN32
-
 #ifndef JACE_WIN32_VM_LOADER
 #define JACE_WIN32_VM_LOADER
+
+#ifdef _WIN32
 
 #include "jace/Namespace.h"
 #include "jace/JNIException.h"
@@ -36,7 +32,7 @@ public:
 	/**
 	 * The JVM Vendors supported by this loader.
 	 */
-	JACE_API enum JVMVendor
+	enum JVMVendor
 	{
 		JVMV_SUN,
 		JVMV_IBM
@@ -45,7 +41,7 @@ public:
 	/**
 	 * JVM types supported by this loader.
 	 */
-	JACE_API enum JVMType
+	enum JVMType
 	{
 		JVMT_DEFAULT,
 		JVMT_CLASSIC, // Up to 1.3
@@ -75,10 +71,10 @@ public:
 	 *
 	 * @throws JNIException if an error occurs while loading the JVM library.
 	 */
-	JACE_API Win32VmLoader(JVMVendor jvmVendor = JVMV_SUN,
-		JVMType jvmType = JVMT_DEFAULT,
-		std::string version = "",
-		jint jniVersion = DEFAULT_JNI_VERSION) throw (JNIException);
+	Win32VmLoader(JVMVendor jvmVendor = JVMV_SUN,
+		          JVMType jvmType = JVMT_DEFAULT,
+		          std::string version = "",
+		          jint jniVersion = DEFAULT_JNI_VERSION);
 
 	/**
 	 * Creates a new VM loader for the specified VM.
@@ -93,12 +89,12 @@ public:
 	 *
 	 * @throws JNIException if an error occurs while loading the JVM library.
 	 */
-	JACE_API Win32VmLoader(std::string path, jint jniVersion = DEFAULT_JNI_VERSION) throw (JNIException);
+	Win32VmLoader(std::string path, jint jniVersion = DEFAULT_JNI_VERSION);
 
-	JACE_API virtual ~Win32VmLoader();
+	virtual ~Win32VmLoader();
 
-	JACE_API jint getCreatedJavaVMs(JavaVM **vmBuf, jsize bufLen, jsize *nVMs) const;
-	JACE_API jint createJavaVM(JavaVM **pvm, void **env, void *args) const;
+	jint getCreatedJavaVMs(JavaVM **vmBuf, jsize bufLen, jsize *nVMs) const;
+	jint createJavaVM(JavaVM **pvm, void **env, void *args) const;
 
 private:
 	typedef jint (JNICALL *GetCreatedJavaVMs_t)(JavaVM **vmBuf, jsize bufLen, jsize *nVMs);
@@ -132,7 +128,7 @@ private:
 	 *
 	 * @throws JNIException if an error occurs while trying to load the VM.
 	 */
-	void loadVm(const std::string& path) throw (JNIException);
+	void loadVm(const std::string& path);
 };
 
 END_NAMESPACE(jace)

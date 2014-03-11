@@ -1,14 +1,11 @@
 #ifndef JACE_JENLISTER_H
 #define JACE_JENLISTER_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 #include "jace/Jace.h"
 #include "jace/JFactory.h"
 
-#include "jace/BoostWarningOff.h"
 #include <boost/shared_ptr.hpp>
-#include "jace/BoostWarningOn.h"
 
 
 BEGIN_NAMESPACE(jace)
@@ -55,10 +52,8 @@ public:
 	virtual void throwInstance(jvalue val)
 	{
 		T t(val);
-		JNIEnv* env = attach();
-
 		// We know that val is a jobject, because you can only throw exceptions.
-		deleteLocalRef(env, val.l);
+		deleteLocalRef(val.l), val.l = 0;
 
 		throw t;
 	}

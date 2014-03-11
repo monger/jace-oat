@@ -182,14 +182,6 @@ public class ClassMetaClass implements MetaClass
 		return new ClassMetaClass(mName, new ClassPackage(newPackage));
 	}
 
-	public ClassMetaClass toPeer()
-	{
-		List<String> result = new ArrayList<String>(JaceConstants.getPeerPackage().getComponents());
-		for (String path: mPackage.getPath())
-			result.add(path);
-		return new ClassMetaClass(mName, new ClassPackage(result));
-	}
-
 	@Override
 	public boolean isPrimitive()
 	{

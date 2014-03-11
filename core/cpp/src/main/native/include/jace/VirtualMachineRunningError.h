@@ -17,9 +17,7 @@ public:
 	/**
 	 * Creates a new VirtualMachineRunningError with the given message.
 	 */
-	VirtualMachineRunningError(const std::string& value) throw ():
-			JNIException(value)
-	{}
+	VirtualMachineRunningError(const std::string& value) throw () : JNIException(value) {}
 };
 
 END_NAMESPACE(jace)

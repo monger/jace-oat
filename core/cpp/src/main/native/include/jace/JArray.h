@@ -1,7 +1,6 @@
 #ifndef JACE_JARRAY_H
 #define JACE_JARRAY_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 #include "jace/Jace.h"
 #include "jace/JClassImpl.h"
@@ -17,9 +16,7 @@
 #include "jace/proxy/types/JLong.h"
 #include "jace/proxy/types/JShort.h"
 
-#include "jace/BoostWarningOff.h"
 #include <boost/thread/mutex.hpp>
-#include "jace/BoostWarningOn.h"
 
 #include <string>
 #include <vector>
@@ -86,8 +83,7 @@ public:
 	{
 		jobject localRef = ::jace::JArrayHelper::newArray(size, ElementType::staticGetJavaJniClass());
 		this->setJavaJniObject(localRef);
-		JNIEnv* env = attach();
-		deleteLocalRef(env, localRef);
+		deleteLocalRef(localRef), localRef = 0;
 		_length = size;
 	}
 
@@ -98,32 +94,26 @@ public:
 	 * All subclasses of JArray should provide this constructor
 	 * for their own subclasses.
 	 */
-	JACE_API explicit JArray();
+	explicit JArray();
 
 	/**
 	 * Creates a new JArray from a vector of a convertible type, T.
 	 */
 	template <class T> JArray(const std::vector<T>& values): JObject(0)
 	{
-		#ifdef NO_IMPLICIT_TYPENAME
-			#define TYPENAME typename
-		#else
-			#define TYPENAME
-		#endif
-
 		jobjectArray localArray = ::jace::JArrayHelper::newArray(values.size(), ElementType::staticGetJavaJniClass());
 		this->setJavaJniObject(localArray);
 
 		int i = 0;
 		JNIEnv* env = attach();
 
-		for (TYPENAME std::vector<T>::const_iterator it = values.begin(); it != values.end(); ++it, ++i)
+		for (typename std::vector<T>::const_iterator it = values.begin(); it != values.end(); ++it, ++i)
 		{
 			env->SetObjectArrayElement(localArray, i, ElementType(*it));
 			catchAndThrow();
 		}
 		_length = values.size();
-		deleteLocalRef(env, localArray);
+		env->DeleteLocalRef(localArray), localArray = 0;
 	}
 
 	JArray(const JArray& array): JObject(0)
@@ -178,8 +168,7 @@ public:
 
 		jvalue localElementRef = ::jace::JArrayHelper::getElement(static_cast<jobject>(*this), index);
 		ElementProxy<ElementType> element(this->getJavaJniArray(), localElementRef, index);
-		JNIEnv* env = attach();
-		deleteLocalRef(env, localElementRef.l);
+		deleteLocalRef(localElementRef.l), localElementRef.l = 0;
 		return element;
 	}
 
@@ -201,8 +190,7 @@ public:
 
 		jvalue localElementRef = ::jace::JArrayHelper::getElement(static_cast<jobject>(*this), index);
 		ElementProxy<ElementType> element(this->getJavaJniArray(), localElementRef, index);
-		JNIEnv* env = attach();
-		deleteLocalRef(env, localElementRef.l);
+		deleteLocalRef(localElementRef.l), localElementRef.l = 0;
 		return element;
 	}
 
@@ -212,8 +200,7 @@ public:
 	 *
 	 * @throw JNIException if an error occurs while trying to retrieve the class.
 	 */
-	virtual const ::jace::JClass& getJavaJniClass() const throw (::jace::JNIException)
-	{
+	virtual const ::jace::JClass& getJavaJniClass() const {
 		return JArray<ElementType>::staticGetJavaJniClass();
 	}
 
@@ -223,8 +210,7 @@ public:
 	 *
 	 * @throw JNIException if an error occurs while trying to retrieve the class.
 	 */
-	static const ::jace::JClass& staticGetJavaJniClass() throw (JNIException)
-	{
+	static const ::jace::JClass& staticGetJavaJniClass() {
 		static boost::shared_ptr<JClassImpl> result;
 		boost::mutex::scoped_lock lock(javaClassMutex);
 		if (result == 0)
@@ -517,17 +503,545 @@ private:
 
 template <class ElementType> boost::mutex JArray<ElementType>::javaClassMutex;
 
-END_NAMESPACE(jace)
-
 /**
- * For those (oddball) compilers that need the template specialization
- * definitions in the header.
+ * Contains the definitions for the template specializations of the template class, JArray.
+ *
+ * This file is internal to the JACE library.
+ *
  */
-#ifdef PUT_TSDS_IN_HEADER
-  #include "jace/JArray.tsd"
-#else
-  #include "jace/JArray.tsp"
-#endif
+
+template <> inline
+JArray< ::jace::proxy::types::JBoolean >::JArray(int size)
+{
+  JNIEnv* env = attach();
+  jarray array = env->NewBooleanArray(size);
+
+  catchAndThrow();
+
+  /* If there was a java exception that was thrown, we don't make it here,
+   * but I'm not sure whether the JNI documentation states that a java exception
+   * will be thrown or not. I do know that it does state that the returned array
+   * will be NULL if an error occurs, so I'm doing an extra check here.
+   */
+  if (array == NULL)
+  {
+    std::string msg = std::string("JArray<JBoolean>(int size) - Unable to construct a new array.") +
+                 "The virtual machine's memory could be exhausted.";
+    throw JNIException(msg);
+  }
+
+  setJavaJniObject(array);
+  env->DeleteLocalRef(array), array = 0;
+
+  this->_length = -1;
+}
+
+template <> inline
+ElementProxy< ::jace::proxy::types::JBoolean > JArray< ::jace::proxy::types::JBoolean >::operator[](const int& index)
+{
+  #ifdef JACE_CHECK_NULLS
+    if (this->isNull())
+      throw ::jace::JNIException("[JArray::operator[]] Can not dereference a null array.");
+  #endif
+  
+  #ifdef JACE_CHECK_ARRAYS
+    if (index >= length())
+      throw ::jace::JNIException("[JArray::operator[]] invalid array index.");
+  #endif
+
+  jbooleanArray thisArray = static_cast<jbooleanArray>(getJavaJniArray());
+  JNIEnv* env = attach();
+  jboolean val;
+  env->GetBooleanArrayRegion(thisArray, index, 1, &val);
+  jvalue value;
+  value.z = val;
+  return ElementProxy< ::jace::proxy::types::JBoolean >(getJavaJniArray(), value, index);
+}
+
+template <> inline
+const ElementProxy< ::jace::proxy::types::JBoolean > JArray< ::jace::proxy::types::JBoolean >::operator[](const int& index) const
+{
+  #ifdef JACE_CHECK_NULLS
+    if (this->isNull())
+      throw ::jace::JNIException("[JArray::operator[]] Can not dereference a null array.");
+  #endif
+  
+  #ifdef JACE_CHECK_ARRAYS
+    if (index >= length())
+      throw ::jace::JNIException("[JArray::operator[]] invalid array index.");
+  #endif
+
+  jbooleanArray thisArray = static_cast<jbooleanArray>(getJavaJniArray());
+  JNIEnv* env = attach();
+  jboolean val;
+  env->GetBooleanArrayRegion(thisArray, index, 1, &val);
+  jvalue value;
+  value.z = val;
+  return ElementProxy< ::jace::proxy::types::JBoolean >(getJavaJniArray(), value, index);
+}
+
+
+template <> inline
+JArray< ::jace::proxy::types::JByte >::JArray(int size)
+{
+  JNIEnv* env = attach();
+  jarray array = env->NewByteArray(size);
+
+  catchAndThrow();
+
+  if (array == NULL)
+  {
+    std::string msg = std::string("JArray<JByte>(int size) - Unable to construct a new byte array.") +
+                 "The virtual machine's memory could be exhausted.";
+    throw JNIException(msg);
+  }
+
+  setJavaJniObject(array);
+  env->DeleteLocalRef(array), array = 0;
+
+  this->_length = -1;
+}
+
+template <> inline
+ElementProxy< ::jace::proxy::types::JByte > JArray< ::jace::proxy::types::JByte >::operator[](const int& index)
+{
+  #ifdef JACE_CHECK_NULLS
+    if (this->isNull())
+      throw ::jace::JNIException("[JArray::operator[]] Can not dereference a null array.");
+  #endif
+
+  #ifdef JACE_CHECK_ARRAYS
+    if (index >= length())
+      throw ::jace::JNIException("[JArray::operator[]] invalid array index.");
+  #endif
+
+  jbyteArray thisArray = static_cast<jbyteArray>(getJavaJniArray());
+  JNIEnv* env = attach();
+  jbyte byte;
+  env->GetByteArrayRegion(thisArray, index, 1, &byte);
+  jvalue value;
+  value.b = byte;
+  return ElementProxy< ::jace::proxy::types::JByte >(getJavaJniArray(), value, index);
+}
+
+template <> inline
+const ElementProxy< ::jace::proxy::types::JByte > JArray< ::jace::proxy::types::JByte >::operator[](const int& index) const
+{
+  #ifdef JACE_CHECK_NULLS
+    if (this->isNull())
+      throw ::jace::JNIException("[JArray::operator[]] Can not dereference a null array.");
+  #endif
+
+  #ifdef JACE_CHECK_ARRAYS
+    if (index >= length())
+      throw ::jace::JNIException("[JArray::operator[]] invalid array index.");
+  #endif
+
+  jbyteArray thisArray = static_cast<jbyteArray>(getJavaJniArray());
+  JNIEnv* env = attach();
+  jbyte byte;
+  env->GetByteArrayRegion(thisArray, index, 1, &byte);
+  jvalue value;
+  value.b = byte;
+  return ElementProxy< ::jace::proxy::types::JByte >(getJavaJniArray(), value, index);
+}
+
+template <> inline
+JArray< ::jace::proxy::types::JChar >::JArray(int size)
+{
+  JNIEnv* env = attach();
+  jarray array = env->NewCharArray(size);
+
+  catchAndThrow();
+
+  if (array == NULL)
+  {
+    std::string msg = std::string("JArray<JChar>(int size) - Unable to construct a new array.") +
+                 "The virtual machine's memory could be exhausted.";
+    throw JNIException(msg);
+  }
+
+  setJavaJniObject(array);
+  env->DeleteLocalRef(array), array = 0;
+
+  this->_length = -1;
+}
+
+template <> inline
+ElementProxy< ::jace::proxy::types::JChar > JArray< ::jace::proxy::types::JChar >::operator[](const int& index)
+{
+  #ifdef JACE_CHECK_NULLS
+    if (this->isNull())
+      throw ::jace::JNIException("[JArray::operator[]] Can not dereference a null array.");
+  #endif
+
+  #ifdef JACE_CHECK_ARRAYS
+    if (index >= length())
+      throw ::jace::JNIException("[JArray::operator[]] invalid array index.");
+  #endif
+
+  jcharArray thisArray = static_cast<jcharArray>(getJavaJniArray());
+  JNIEnv* env = attach();
+  jchar val;
+  env->GetCharArrayRegion(thisArray, index, 1, &val);
+  jvalue value;
+  value.c = val;
+  return ElementProxy< ::jace::proxy::types::JChar >(getJavaJniArray(), value, index);
+}
+
+template <> inline
+const ElementProxy< ::jace::proxy::types::JChar > JArray< ::jace::proxy::types::JChar >::operator[](const int& index) const
+{
+  #ifdef JACE_CHECK_NULLS
+    if (this->isNull())
+      throw ::jace::JNIException("[JArray::operator[]] Can not dereference a null array.");
+  #endif
+
+  #ifdef JACE_CHECK_ARRAYS
+    if (index >= length())
+      throw ::jace::JNIException("[JArray::operator[]] invalid array index.");
+  #endif
+
+  jcharArray thisArray = static_cast<jcharArray>(getJavaJniArray());
+  JNIEnv* env = attach();
+  jchar val;
+  env->GetCharArrayRegion(thisArray, index, 1, &val);
+  jvalue value;
+  value.c = val;
+  return ElementProxy< ::jace::proxy::types::JChar >(getJavaJniArray(), value, index);
+}
+
+
+template <> inline
+JArray< ::jace::proxy::types::JDouble >::JArray(int size)
+{
+  JNIEnv* env = attach();
+  jarray array = env->NewDoubleArray(size);
+
+  catchAndThrow();
+
+  if (array == NULL)
+  {
+    std::string msg = std::string("JArray<JDouble>(int size) - Unable to construct a new array.") +
+                 "The virtual machine's memory could be exhausted.";
+    throw JNIException(msg);
+  }
+
+  setJavaJniObject(array);
+  env->DeleteLocalRef(array), array = 0;
+
+  this->_length = -1;
+}
+
+template <> inline
+ElementProxy< ::jace::proxy::types::JDouble > JArray< ::jace::proxy::types::JDouble >::operator[](const int& index)
+{
+  #ifdef JACE_CHECK_NULLS
+    if (this->isNull())
+      throw ::jace::JNIException("[JArray::operator[]] Can not dereference a null array.");
+  #endif
+
+  #ifdef JACE_CHECK_ARRAYS
+    if (index >= length())
+      throw ::jace::JNIException("[JArray::operator[]] invalid array index.");
+  #endif
+
+  jdoubleArray thisArray = static_cast<jdoubleArray>(getJavaJniArray());
+  JNIEnv* env = attach();
+  jdouble val;
+  env->GetDoubleArrayRegion(thisArray, index, 1, &val);
+  jvalue value;
+  value.d = val;
+  return ElementProxy< ::jace::proxy::types::JDouble >(getJavaJniArray(), value, index);
+}
+
+template <> inline
+const ElementProxy< ::jace::proxy::types::JDouble > JArray< ::jace::proxy::types::JDouble >::operator[](const int& index) const
+{
+  #ifdef JACE_CHECK_NULLS
+    if (this->isNull())
+      throw ::jace::JNIException("[JArray::operator[]] Can not dereference a null array.");
+  #endif
+
+  #ifdef JACE_CHECK_ARRAYS
+    if (index >= length())
+      throw ::jace::JNIException("[JArray::operator[]] invalid array index.");
+  #endif
+
+  jdoubleArray thisArray = static_cast<jdoubleArray>(getJavaJniArray());
+  JNIEnv* env = attach();
+  jdouble val;
+  env->GetDoubleArrayRegion(thisArray, index, 1, &val);
+  jvalue value;
+  value.d = val;
+  return ElementProxy< ::jace::proxy::types::JDouble >(getJavaJniArray(), value, index);
+}
+
+
+template <> inline
+JArray< ::jace::proxy::types::JFloat >::JArray(int size)
+{
+  JNIEnv* env = attach();
+  jarray array = env->NewFloatArray(size);
+
+  catchAndThrow();
+
+  if (array == NULL)
+  {
+    std::string msg = std::string("JArray<JFloat>(int size) - Unable to construct a new array.") +
+                 "The virtual machine's memory could be exhausted.";
+    throw JNIException(msg);
+  }
+
+  setJavaJniObject(array);
+  env->DeleteLocalRef(array), array = 0;
+
+  this->_length = -1;
+}
+
+template <> inline
+ElementProxy< ::jace::proxy::types::JFloat > JArray< ::jace::proxy::types::JFloat >::operator[](const int& index)
+{
+  #ifdef JACE_CHECK_NULLS
+    if (this->isNull())
+      throw ::jace::JNIException("[JArray::operator[]] Can not dereference a null array.");
+  #endif
+
+  #ifdef JACE_CHECK_ARRAYS
+    if (index >= length())
+      throw ::jace::JNIException("[JArray::operator[]] invalid array index.");
+  #endif
+
+  jfloatArray thisArray = static_cast<jfloatArray>(getJavaJniArray());
+  JNIEnv* env = attach();
+  jfloat val;
+  env->GetFloatArrayRegion(thisArray, index, 1, &val);
+  jvalue value;
+  value.f = val;
+  return ElementProxy< ::jace::proxy::types::JFloat >(getJavaJniArray(), value, index);
+}
+
+template <> inline
+const ElementProxy< ::jace::proxy::types::JFloat > JArray< ::jace::proxy::types::JFloat >::operator[](const int& index) const
+{
+  #ifdef JACE_CHECK_NULLS
+    if (this->isNull())
+      throw ::jace::JNIException("[JArray::operator[]] Can not dereference a null array.");
+  #endif
+
+  #ifdef JACE_CHECK_ARRAYS
+    if (index >= length())
+      throw ::jace::JNIException("[JArray::operator[]] invalid array index.");
+  #endif
+
+  jfloatArray thisArray = static_cast<jfloatArray >(getJavaJniArray());
+  JNIEnv* env = attach();
+  jfloat val;
+  env->GetFloatArrayRegion(thisArray, index, 1, &val);
+  jvalue value;
+  value.f = val;
+  return ElementProxy< ::jace::proxy::types::JFloat >(getJavaJniArray(), value, index);
+}
+
+
+template <> inline
+JArray< ::jace::proxy::types::JInt >::JArray(int size)
+{
+  JNIEnv* env = attach();
+  jarray array = env->NewIntArray(size);
+
+  catchAndThrow();
+
+  if (array == NULL)
+  {
+    std::string msg = std::string("JArray<JInt>(int size) - Unable to construct a new array.") +
+                 "The virtual machine's memory could be exhausted.";
+    throw JNIException(msg);
+  }
+
+  setJavaJniObject(array);
+  env->DeleteLocalRef(array), array = 0;
+
+  this->_length = -1;
+}
+
+template <> inline
+ElementProxy< ::jace::proxy::types::JInt > JArray< ::jace::proxy::types::JInt >::operator[](const int& index)
+{
+  #ifdef JACE_CHECK_NULLS
+    if (this->isNull())
+      throw ::jace::JNIException("[JArray::operator[]] Can not dereference a null array.");
+  #endif
+
+  #ifdef JACE_CHECK_ARRAYS
+    if (index >= length())
+      throw ::jace::JNIException("[JArray::operator[]] invalid array index.");
+  #endif
+
+  jintArray thisArray = static_cast<jintArray>(getJavaJniArray());
+  JNIEnv* env = attach();
+  jint val;
+  env->GetIntArrayRegion(thisArray, index, 1, &val);
+  jvalue value;
+  value.i = val;
+  return ElementProxy< ::jace::proxy::types::JInt >(getJavaJniArray(), value, index);
+}
+
+template <> inline
+const ElementProxy< ::jace::proxy::types::JInt > JArray< ::jace::proxy::types::JInt >::operator[](const int& index) const
+{
+  #ifdef JACE_CHECK_NULLS
+    if (this->isNull())
+      throw ::jace::JNIException("[JArray::operator[]] Can not dereference a null array.");
+  #endif
+
+  #ifdef JACE_CHECK_ARRAYS
+    if (index >= length())
+      throw ::jace::JNIException("[JArray::operator[]] invalid array index.");
+  #endif
+
+  jintArray thisArray = static_cast<jintArray>(getJavaJniArray());
+  JNIEnv* env = attach();
+  jint val;
+  env->GetIntArrayRegion(thisArray, index, 1, &val);
+  jvalue value;
+  value.i = val;
+  return ElementProxy< ::jace::proxy::types::JInt >(getJavaJniArray(), value, index);
+}
+
+
+template <> inline
+JArray< ::jace::proxy::types::JLong >::JArray(int size)
+{
+  JNIEnv* env = attach();
+  jarray array = env->NewLongArray(size);
+
+  catchAndThrow();
+
+  if (array == NULL)
+  {
+    std::string msg = std::string("JArray<JLong>(int size) - Unable to construct a new array.") +
+                 "The virtual machine's memory could be exhausted.";
+    throw JNIException(msg);
+  }
+
+  setJavaJniObject(array);
+  env->DeleteLocalRef(array), array = 0;
+
+  this->_length = -1;
+}
+
+template <> inline
+ElementProxy< ::jace::proxy::types::JLong > JArray< ::jace::proxy::types::JLong >::operator[](const int& index)
+{
+  #ifdef JACE_CHECK_NULLS
+    if (this->isNull())
+      throw ::jace::JNIException("[JArray::operator[]] Can not dereference a null array.");
+  #endif
+
+  #ifdef JACE_CHECK_ARRAYS
+    if (index >= length())
+      throw ::jace::JNIException("[JArray::operator[]] invalid array index.");
+  #endif
+
+  jlongArray thisArray = static_cast<jlongArray>(getJavaJniArray());
+  JNIEnv* env = attach();
+  jlong val;
+  env->GetLongArrayRegion(thisArray, index, 1, &val);
+  jvalue value;
+  value.j = val;
+  return ElementProxy< ::jace::proxy::types::JLong >(getJavaJniArray(), value, index);
+}
+
+template <> inline
+const ElementProxy< ::jace::proxy::types::JLong > JArray< ::jace::proxy::types::JLong >::operator[](const int& index) const
+{
+  #ifdef JACE_CHECK_NULLS
+    if (this->isNull())
+      throw ::jace::JNIException("[JArray::operator[]] Can not dereference a null array.");
+  #endif
+
+  #ifdef JACE_CHECK_ARRAYS
+    if (index >= length())
+      throw ::jace::JNIException("[JArray::operator[]] invalid array index.");
+  #endif
+
+  jlongArray thisArray = static_cast<jlongArray>(getJavaJniArray());
+  JNIEnv* env = attach();
+  jlong val;
+  env->GetLongArrayRegion(thisArray, index, 1, &val);
+  jvalue value;
+  value.j = val;
+  return ElementProxy< ::jace::proxy::types::JLong >(getJavaJniArray(), value, index);
+}
+
+
+template <> inline
+JArray< ::jace::proxy::types::JShort >::JArray(int size)
+{
+  JNIEnv* env = attach();
+  jarray array = env->NewShortArray(size);
+
+  catchAndThrow();
+
+  if (array == NULL)
+  {
+    std::string msg = std::string("JArray<JShort>(int size) - Unable to construct a new array.") +
+                 "The virtual machine's memory could be exhausted.";
+    throw JNIException(msg);
+  }
+
+  setJavaJniObject(array);
+  env->DeleteLocalRef(array), array = 0;
+
+  this->_length = -1;
+}
+
+template <> inline
+ElementProxy< ::jace::proxy::types::JShort > JArray< ::jace::proxy::types::JShort >::operator[](const int& index)
+{
+  #ifdef JACE_CHECK_NULLS
+    if (this->isNull())
+      throw ::jace::JNIException("[JArray::operator[]] Can not dereference a null array.");
+  #endif
+
+  #ifdef JACE_CHECK_ARRAYS
+    if (index >= length())
+      throw ::jace::JNIException("[JArray::operator[]] invalid array index.");
+  #endif
+
+  jshortArray thisArray = static_cast<jshortArray>(getJavaJniArray());
+  JNIEnv* env = attach();
+  jshort val;
+  env->GetShortArrayRegion(thisArray, index, 1, &val);
+  jvalue value;
+  value.s = val;
+  return ElementProxy< ::jace::proxy::types::JShort >(getJavaJniArray(), value, index);
+}
+
+template <> inline
+const ElementProxy< ::jace::proxy::types::JShort > JArray< ::jace::proxy::types::JShort >::operator[](const int& index) const
+{
+  #ifdef JACE_CHECK_NULLS
+    if (this->isNull())
+      throw ::jace::JNIException("[JArray::operator[]] Can not dereference a null array.");
+  #endif
+
+  #ifdef JACE_CHECK_ARRAYS
+    if (index >= length())
+      throw ::jace::JNIException("[JArray::operator[]] invalid array index.");
+  #endif
+
+  jshortArray thisArray = static_cast<jshortArray>(getJavaJniArray());
+  JNIEnv* env = attach();
+  jshort val;
+  env->GetShortArrayRegion(thisArray, index, 1, &val);
+  jvalue value;
+  value.s = val;
+  return ElementProxy< ::jace::proxy::types::JShort >(getJavaJniArray(), value, index);
+}
+
+END_NAMESPACE(jace)
 
 #endif // #ifndef JACE_JARRAY_H
 

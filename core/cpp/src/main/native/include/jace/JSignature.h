@@ -1,16 +1,13 @@
 #ifndef JACE_JSIGNATURE_H
 #define JACE_JSIGNATURE_H
 
-#include "jace/OsDep.h"
 #include "jace/Namespace.h"
 #include "jace/JClass.h"
 
 #include <string>
 #include <list>
 
-#include "jace/BoostWarningOff.h"
 #include <boost/ref.hpp>
-#include "jace/BoostWarningOn.h"
 
 BEGIN_NAMESPACE(jace)
 
@@ -29,7 +26,7 @@ public:
 	/**
 	 * Constructs a new JSignature with the given return type.
 	 */
-	JACE_API JSignature(const JClass& returnType);
+	JSignature(const JClass& returnType);
 
 
 	/**
@@ -47,20 +44,20 @@ public:
 	 *
 	 *   "(Ljava/lang/String;Ljava/net/URL;)V"
 	 */
-	JACE_API std::string toString() const;
+	std::string toString() const;
 
 	/**
 	 * Adds a new argument type to the method signature.
 	 *
 	 * A JSignature may have any arbitrary number of argument types,
 	 */
-	JACE_API JSignature& add(const JClass& argumentType);
+	JSignature& add(const JClass& argumentType);
 
 
 	/**
 	 * A convenience operator for JSignature.add.
 	 */
-	JACE_API JSignature& operator<<(const JClass& argumentType);
+	JSignature& operator<<(const JClass& argumentType);
 
 private:
 	/**
